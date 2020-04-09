@@ -9,9 +9,15 @@ public class GameStateManager : MonoBehaviour
     [SerializeField]private GameObject playingCard;
     // public Cards[] 
     public List<GameObject> unusedTopDeck;
-    public List<GameObject> unusedBottomDeck;
+    public List<GameObject> unusedKings;
 
+    public List<GameObject> unusedBottomDeck;
+    public List<GameObject> usedBottomDeck;
     public static GameObject[,] LootArea;
+
+    public List<GameObject> KingsInTheUnwanted;
+
+    public GameObject DummyActiveCard = null;
 
     [SerializeField]private Transform TopDeckTransform;
     [SerializeField]private Transform BottomDeckTransform;
@@ -25,6 +31,9 @@ public class GameStateManager : MonoBehaviour
     {
         unusedTopDeck = new List<GameObject>();
         unusedBottomDeck = new List<GameObject>();
+        usedBottomDeck = new List<GameObject>();
+        unusedKings = new List<GameObject>();
+        KingsInTheUnwanted = new List<GameObject>();
         LootArea = new GameObject[4, 4];
        ChangeState(new Setup(this));
     }
@@ -65,6 +74,12 @@ public class GameStateManager : MonoBehaviour
                     currentCard.transform.position = BottomDeckTransform.position;
                     currentCard.SetActive(false);
                 }
+                else if (j == 13)
+                {
+                    unusedKings.Add(currentCard);
+                    currentCard.transform.position = TopDeckTransform.position;
+                    currentCard.SetActive(false);
+                }
 
             }
         }
@@ -94,7 +109,7 @@ public class GameStateManager : MonoBehaviour
             }
         }
 
-        if (unusedTopDeck.Count == 0)
+        if (unusedTopDeck.Count == 0&& unusedKings.Count == 0)
         {
             return false;
         }
@@ -114,4 +129,29 @@ public class GameStateManager : MonoBehaviour
             return true;
         }
     }
+
+    public void FlipANewDummyActiveCard()
+    {
+        if (DummyActiveCard != null)
+        {
+        DummyActiveCard.SetActive(false);
+        }
+        
+        if (unusedBottomDeck.Count == 0)
+        {
+            unusedBottomDeck = usedBottomDeck;
+            usedBottomDeck.Clear();
+        }
+        int randomIndex = Random.Range(0,unusedBottomDeck.Count);
+        DummyActiveCard = unusedBottomDeck[randomIndex];
+        DummyActiveCard.SetActive(true);
+        DummyActiveCard.GetComponent<PlayingCards>().StartMoving(new Vector3(-8.5f,-2.5f,0));
+        usedBottomDeck.Add(unusedBottomDeck[randomIndex]);
+        unusedBottomDeck.RemoveAt(randomIndex);
+    }
+
+    //public GameObject[] DummyAI()
+   // {
+        
+   // }
 }

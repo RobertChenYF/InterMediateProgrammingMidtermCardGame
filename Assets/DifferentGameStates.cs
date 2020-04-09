@@ -41,18 +41,20 @@ public class Refill : GameState
     }
     public override void stateBehavior()
     {
-        while (gameStateManager.DealCardToLoot())
-        {
-            Debug.Log("DealCardToLoot");
-        }
-        Debug.Log("Deal over");
+
+        
 
     }
 
     public override void Enter()
     {
         base.Enter();
-        
+        gameStateManager.FlipANewDummyActiveCard();
+        while (gameStateManager.DealCardToLoot())
+        {
+            Debug.Log("DealCardToLoot");
+        }
+        //Dummy AI Determine its action
 
     }
     public override void Leave()
