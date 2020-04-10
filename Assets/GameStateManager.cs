@@ -7,7 +7,7 @@ public class GameStateManager : MonoBehaviour
     public Sprite[] cardImage;
     private GameState currentGameState;
     [SerializeField] private GameObject playingCard;
-    // public Cards[] 
+   
     public List<GameObject> unusedTopDeck;
     public List<GameObject> unusedKings;
 
@@ -32,7 +32,7 @@ public class GameStateManager : MonoBehaviour
     public static int highlightSuit = 0;
     public static int highlightCol = -1;
 
-    public static bool canInteract = true;
+    public static bool canInteract = false;
     // Start is called before the first frame update
     void Start()
     {
@@ -70,6 +70,7 @@ public class GameStateManager : MonoBehaviour
         currentGameState.Enter();
     }
 
+    //generate all the card at the beginning of the game
     public void MakingAllCards()
     {
         for (int i = 1; i < 5; i++)
@@ -104,6 +105,7 @@ public class GameStateManager : MonoBehaviour
         }
     }
 
+    //refill card to the loot;
     public bool DealCardToLoot()
     {
         bool fullLoot = true;
@@ -149,6 +151,7 @@ public class GameStateManager : MonoBehaviour
         }
     }
 
+    //flip a new action card for dummy;
     public void FlipANewDummyActiveCard()
     {
         if (DummyActiveCard != null)
@@ -169,6 +172,7 @@ public class GameStateManager : MonoBehaviour
         unusedBottomDeck.RemoveAt(randomIndex);
     }
 
+    //Dummy's AI determine dummy's action
     public List<GameObject> DummyAI()
     {
         KingsInEachColumn();
@@ -191,29 +195,29 @@ public class GameStateManager : MonoBehaviour
             }
         }
 
-        
+
         List<int> thisIndex = new List<int>();
         for (int i = 0; i < KingCardsInEachColumn.Length; i++)
         {
             if (KingCardsInEachColumn[i] == 2)
             {
                 thisIndex.Add(i);
-                
+
             }
         }
         int theColumn = ColumnToTake(DummyActiveCard.GetComponent<PlayingCards>().Suit, thisIndex);
-                //take the most amount of cards from the loot or the unwanted
-              //  if (theColumn > -1)
-             //   {
-              //      Debug.Log("picked column: " + theColumn);
-            if (cardsWithSuitInThatColumn(DummyActiveCard.GetComponent<PlayingCards>().Suit, theColumn).Count != 0)
-            {
+        //take the most amount of cards from the loot or the unwanted
+        //  if (theColumn > -1)
+        //   {
+        //      Debug.Log("picked column: " + theColumn);
+        if (cardsWithSuitInThatColumn(DummyActiveCard.GetComponent<PlayingCards>().Suit, theColumn).Count != 0)
+        {
             Debug.Log("return 2 king");
-                return cardsWithSuitInThatColumn(DummyActiveCard.GetComponent<PlayingCards>().Suit, theColumn);
-            }
-                    
+            return cardsWithSuitInThatColumn(DummyActiveCard.GetComponent<PlayingCards>().Suit, theColumn);
+        }
 
-            //    }
+
+        //    }
         thisIndex.Clear();
         for (int i = 0; i < KingCardsInEachColumn.Length; i++)
         {
@@ -225,40 +229,41 @@ public class GameStateManager : MonoBehaviour
         }
         theColumn = ColumnToTake(DummyActiveCard.GetComponent<PlayingCards>().Suit, thisIndex);
         //take the most amount of cards from the loot or the unwanted
-       // if (theColumn > -1)
-       // {
-           // Debug.Log("picked column: " + theColumn);
+        // if (theColumn > -1)
+        // {
+        // Debug.Log("picked column: " + theColumn);
 
-            if (cardsWithSuitInThatColumn(DummyActiveCard.GetComponent<PlayingCards>().Suit, theColumn).Count != 0)
-            {
+        if (cardsWithSuitInThatColumn(DummyActiveCard.GetComponent<PlayingCards>().Suit, theColumn).Count != 0)
+        {
             Debug.Log("return 1 king");
-                return cardsWithSuitInThatColumn(DummyActiveCard.GetComponent<PlayingCards>().Suit, theColumn);
-            }
-            
+            return cardsWithSuitInThatColumn(DummyActiveCard.GetComponent<PlayingCards>().Suit, theColumn);
+        }
 
-       // }
+
+        // }
 
 
         List<int> allAvaibleOption = new List<int> { 0, 1, 2, 3, 4 };
 
         int theColumnToPick = ColumnToTake(DummyActiveCard.GetComponent<PlayingCards>().Suit, allAvaibleOption);
         //take the most amount of cards from the loot or the unwanted
-       //  if (theColumnToPick != -1)
-       //   {
+        //  if (theColumnToPick != -1)
+        //   {
         Debug.Log("picked column: " + theColumnToPick);
 
-            if (cardsWithSuitInThatColumn(DummyActiveCard.GetComponent<PlayingCards>().Suit, theColumnToPick).Count != 0)
-            {
+        if (cardsWithSuitInThatColumn(DummyActiveCard.GetComponent<PlayingCards>().Suit, theColumnToPick).Count != 0)
+        {
             Debug.Log("return no king");
             return cardsWithSuitInThatColumn(DummyActiveCard.GetComponent<PlayingCards>().Suit, theColumnToPick);
-            }
-            
+        }
 
-       // }
-       Debug.Log("cannnot return");
+
+        // }
+        Debug.Log("cannnot return");
         return cardsPlanningToTake;
     }
 
+    //update the amount of king cards in each column
     public void KingsInEachColumn()
     {
         for (int i = 0; i < 4; i++)
@@ -279,10 +284,10 @@ public class GameStateManager : MonoBehaviour
             }
         }
 
-       
+
     }
 
-    //determine what column to take based on 
+    //determine what column to take based on its priority of dummy
     public int ColumnToTake(int suit, List<int> whichColumnsToEnter)
     {
         //go through all the column listed, if there is one column with the most amount of that suit return the column index(0-4) 4 stands for the unwanted
@@ -300,20 +305,22 @@ public class GameStateManager : MonoBehaviour
         else
         {
             int highestAmountOfSuit = SuitOfAColumn(suit, whichColumnsToEnter[0]);
-            List<int> highestAmountOfSuitIndex = new List<int>();
+            List<int> highestAmountOfSuitIndex;
+            highestAmountOfSuitIndex = new List<int>();
             highestAmountOfSuitIndex.Add(whichColumnsToEnter[0]);
             for (int i = 1; i < whichColumnsToEnter.Count; i++)
             {
                 if (SuitOfAColumn(suit, whichColumnsToEnter[i]) > highestAmountOfSuit)
                 {
                     highestAmountOfSuitIndex.Clear();
+                    highestAmountOfSuit = SuitOfAColumn(suit, whichColumnsToEnter[i]);
                     highestAmountOfSuitIndex.Add(whichColumnsToEnter[i]);
-                    Debug.Log(highestAmountOfSuitIndex);// clear the list and add it to the list if it is higher;
+                    // clear the list and add it to the list if it is higher;
                 }
                 else if (SuitOfAColumn(suit, whichColumnsToEnter[i]) == highestAmountOfSuit)
                 {
                     highestAmountOfSuitIndex.Add(whichColumnsToEnter[i]); //add it to the list if it is a tie;
-                    Debug.Log(highestAmountOfSuitIndex);
+
                 }
 
             }
@@ -338,6 +345,7 @@ public class GameStateManager : MonoBehaviour
         }
     }
 
+    //return the number of copies of suit in that column
     public int SuitOfAColumn(int suit, int columnIndex)
     {
         if (columnIndex < 4) //count the loot area
@@ -353,10 +361,10 @@ public class GameStateManager : MonoBehaviour
                         SuitCount++;
                     }
                 }
- 
+
             }
             return SuitCount;
-           
+
         }
         else
         {
@@ -376,21 +384,23 @@ public class GameStateManager : MonoBehaviour
         }
     }
 
+    //return the column with the cards with the highest ranking
     public int RankingOfColumn(int suit, List<int> columnIndex)
     {
         List<GameObject> firstlist = new List<GameObject>();
         int highestRanking = 0;
-        int highestRankingIndex = -1;
+        int highestRankingIndex = columnIndex[0];
         firstlist = cardsWithSuitInThatColumn(suit, columnIndex[0]);
         foreach (GameObject card in firstlist)
         {
-            if(card.GetComponent<PlayingCards>().Ranking > highestRanking && card.GetComponent<PlayingCards>().Ranking != 13)
+            if (card.GetComponent<PlayingCards>().Ranking > highestRanking && card.GetComponent<PlayingCards>().Ranking != 13)
             {
                 highestRanking = card.GetComponent<PlayingCards>().Ranking;
-                highestRankingIndex = 0;
+                highestRankingIndex = columnIndex[0];
             }
         }
-        for (int i = 1; i < columnIndex.Count; i++) {
+        for (int i = 1; i < columnIndex.Count; i++)
+        {
 
             firstlist = cardsWithSuitInThatColumn(suit, columnIndex[i]);
 
@@ -399,7 +409,7 @@ public class GameStateManager : MonoBehaviour
                 if (card.GetComponent<PlayingCards>().Ranking > highestRanking && card.GetComponent<PlayingCards>().Ranking != 13)
                 {
                     highestRanking = card.GetComponent<PlayingCards>().Ranking;
-                    highestRankingIndex = i;
+                    highestRankingIndex = columnIndex[i];
                 }
             }
 
@@ -409,11 +419,12 @@ public class GameStateManager : MonoBehaviour
         return highestRankingIndex;// return the column with the highest ranking card except court cards;
     }
 
+    //return the list of Gameobject of all the cards of that suit in that column
     public List<GameObject> cardsWithSuitInThatColumn(int suit, int ColumnIndex)
     {
         List<GameObject> allCardsWithThisSuit = new List<GameObject>();
 
-        if (ColumnIndex<0)
+        if (ColumnIndex < 0)
         {
             return allCardsWithThisSuit;
         }
@@ -451,6 +462,7 @@ public class GameStateManager : MonoBehaviour
         }
     }
 
+    //claim card from the stack, for players and dummy
     public void ClaimCard(int suit, int ColumnIndex, bool Player)
     {
         Vector3 TargetDummyLocation = new Vector3(-10, 0, 0);
@@ -495,6 +507,9 @@ public class GameStateManager : MonoBehaviour
             {
                 // claim cards from the unwanted
             }
+
+            //end player turn after claim the cards;
+
         }
         else //dummy claim
         {
@@ -538,7 +553,7 @@ public class GameStateManager : MonoBehaviour
         }
     }
 
-
+    //adding cards to the unwanted after the claim
     public int AddToTheUnwanted(GameObject card)
     {
         int thinestStackIndex = 0;
@@ -561,6 +576,7 @@ public class GameStateManager : MonoBehaviour
         return thinestStackIndex;
     }
 
+    //refresh the color of card to show the card dummy is going to take based on current situation
     public void RefreshDummyAI()
     {
         for (int i = 0; i < 4; i++)
@@ -568,7 +584,7 @@ public class GameStateManager : MonoBehaviour
             if (unwantedStack[i].Count != 0)
             {
                 unwantedStack[i].Peek().GetComponent<PlayingCards>().readyToBePickedByDummy = false;
-                
+
 
             }
         }
@@ -580,7 +596,7 @@ public class GameStateManager : MonoBehaviour
                 if (LootArea[i, j] != null)
                 {
                     LootArea[i, j].GetComponent<PlayingCards>().readyToBePickedByDummy = false;
-                   
+
                 }
             }
         }
@@ -594,12 +610,12 @@ public class GameStateManager : MonoBehaviour
         else
         {
             foreach (GameObject card in cardsReadyToBEPickedByDummy)
-        {
-            card.GetComponent<PlayingCards>().readyToBePickedByDummy = true;
-            
+            {
+                card.GetComponent<PlayingCards>().readyToBePickedByDummy = true;
+
+            }
         }
-        }
-        
-        
+
+
     }
 }

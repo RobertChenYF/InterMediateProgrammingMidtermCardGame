@@ -42,7 +42,7 @@ public class Refill : GameState
     public override void stateBehavior()
     {
 
-        
+        gameStateManager.ChangeState(new PlayerTurn(gameStateManager));
 
     }
 
@@ -61,10 +61,37 @@ public class Refill : GameState
     public override void Leave()
     {
         base.Leave();
-
+        
     }
 
 }
+
+public class PlayerTurn : GameState
+{
+    public PlayerTurn(GameStateManager theGameStateManager) : base(theGameStateManager)
+    {
+
+    }
+
+    public override void stateBehavior()
+    {
+        
+    }
+    public override void Enter()
+    {
+        base.Enter();
+        GameStateManager.canInteract = true;
+    }
+
+    public override void Leave()
+    {
+        base.Leave();
+        GameStateManager.canInteract = false;
+    }
+}
+
+
+    
 
 
 
