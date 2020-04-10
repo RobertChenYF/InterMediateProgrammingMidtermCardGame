@@ -54,7 +54,8 @@ public class Refill : GameState
         {
             Debug.Log("DealCardToLoot");
         }
-        //Dummy AI Determine its action
+        gameStateManager.RefreshDummyAI();
+        
 
     }
     public override void Leave()
