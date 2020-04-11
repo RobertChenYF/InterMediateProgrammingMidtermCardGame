@@ -98,6 +98,8 @@ MonoBehaviour:
   highlightColor: {r: 1, g: 0.96555746, b: 0.48584908, a: 1}
   white: {r: 1, g: 1, b: 1, a: 1}
   blue: {r: 0.565381, g: 1, b: 0.36470592, a: 1}
+  red: {r: 1, g: 0.33490568, b: 0.33490568, a: 1}
+  yellow: {r: 1, g: 0.96470594, b: 0.48627454, a: 1}
   Suit: 0
   Ranking: 0
   cardCode: 0

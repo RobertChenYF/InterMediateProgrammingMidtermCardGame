@@ -7,7 +7,7 @@ public class GameStateManager : MonoBehaviour
     public Sprite[] cardImage;
     private GameState currentGameState;
     [SerializeField] private GameObject playingCard;
-   
+
     public List<GameObject> unusedTopDeck;
     public List<GameObject> unusedKings;
 
@@ -24,15 +24,27 @@ public class GameStateManager : MonoBehaviour
 
     public List<GameObject> KingsInTheUnwanted;
 
-    public GameObject DummyActiveCard = null;
+    public static List<GameObject> KingsClaimedByDummy;
+
+    public static float timer;
+    public static GameObject DummyActiveCard = null;
     public int[] KingCardsInEachColumn;
-    [SerializeField] private Transform TopDeckTransform;
-    [SerializeField] private Transform BottomDeckTransform;
+    public Transform TopDeckTransform;
+    public Transform BottomDeckTransform;
+
+    public Transform PlayerClaimedCardLocation;
+    public Transform DummyClaimedCardLocation;
+    public Transform UnwantedKingLocation;
+    public Transform ClaimedKings;
+
+    public static int SuitFromTheUnwantedPlayerChoose = -1;
 
     public static int highlightSuit = 0;
     public static int highlightCol = -1;
 
     public static bool canInteract = false;
+
+    public static bool SelectedCard = false;
     // Start is called before the first frame update
     void Start()
     {
@@ -50,6 +62,7 @@ public class GameStateManager : MonoBehaviour
 
         CardsClaimedByDummy = new List<GameObject>();
         CardsClaimedByPlayer = new List<GameObject>();
+        KingsClaimedByDummy = new List<GameObject>();
         cardsReadyToBEPickedByDummy = new List<GameObject>();
         LootArea = new GameObject[4, 4];
         ChangeState(new Setup(this));
@@ -61,6 +74,12 @@ public class GameStateManager : MonoBehaviour
     void Update()
     {
         currentGameState.stateBehavior();
+        if (timer > 0)
+        {
+            timer -= Time.deltaTime;
+        }
+
+
     }
 
     public void ChangeState(GameState newGameState)
@@ -161,9 +180,13 @@ public class GameStateManager : MonoBehaviour
 
         if (unusedBottomDeck.Count == 0)
         {
-            unusedBottomDeck = usedBottomDeck;
+            foreach(GameObject card in usedBottomDeck) {
+                unusedBottomDeck.Add(card);
+            }
+            
             usedBottomDeck.Clear();
         }
+
         int randomIndex = Random.Range(0, unusedBottomDeck.Count);
         DummyActiveCard = unusedBottomDeck[randomIndex];
         DummyActiveCard.SetActive(true);
@@ -187,9 +210,10 @@ public class GameStateManager : MonoBehaviour
                 {
                     //claim the king and the card in the unwanted;
 
-                    cardsPlanningToTake.Add(king);
-                    // add cards fro the unwanted too;
 
+                    // add cards fro the unwanted too;
+                    cardsPlanningToTake = cardsWithSuitInThatColumn(king.GetComponent<PlayingCards>().Suit, 4);
+                    cardsPlanningToTake.Add(king);
                     return cardsPlanningToTake;
                 }
             }
@@ -465,7 +489,7 @@ public class GameStateManager : MonoBehaviour
     //claim card from the stack, for players and dummy
     public void ClaimCard(int suit, int ColumnIndex, bool Player)
     {
-        Vector3 TargetDummyLocation = new Vector3(-10, 0, 0);
+
         Vector3 TargetPlayerLocation = new Vector3(6.58f, -3.72f, 0);
         Vector3 KingArea = new Vector3(9.62f, -0.65f, 0);
         if (Player)
@@ -477,7 +501,7 @@ public class GameStateManager : MonoBehaviour
                 {
                     if (LootArea[ColumnIndex, i].GetComponent<PlayingCards>().Suit == suit && LootArea[ColumnIndex, i].GetComponent<PlayingCards>().Ranking != 13)
                     {
-                        LootArea[ColumnIndex, i].GetComponent<PlayingCards>().StartMoving(TargetPlayerLocation);
+                        LootArea[ColumnIndex, i].GetComponent<PlayingCards>().StartMoving(PlayerClaimedCardLocation.position);
                         LootArea[ColumnIndex, i].GetComponent<PlayingCards>().CurrentCol = -3;
                         CardsClaimedByPlayer.Add(LootArea[ColumnIndex, i]);
                         LootArea[ColumnIndex, i] = null;
@@ -493,7 +517,7 @@ public class GameStateManager : MonoBehaviour
                     }
                     else if (LootArea[ColumnIndex, i].GetComponent<PlayingCards>().Ranking == 13)
                     {
-                        LootArea[ColumnIndex, i].GetComponent<PlayingCards>().StartMoving(KingArea);
+                        LootArea[ColumnIndex, i].GetComponent<PlayingCards>().StartMoving(UnwantedKingLocation.position);
                         LootArea[ColumnIndex, i].GetComponent<PlayingCards>().CurrentCol = 4;
                         KingsInTheUnwanted.Add(LootArea[ColumnIndex, i]);
                         LootArea[ColumnIndex, i] = null;
@@ -503,12 +527,7 @@ public class GameStateManager : MonoBehaviour
 
 
             }
-            else if (ColumnIndex == 4)
-            {
-                // claim cards from the unwanted
-            }
 
-            //end player turn after claim the cards;
 
         }
         else //dummy claim
@@ -520,7 +539,7 @@ public class GameStateManager : MonoBehaviour
                 {
                     if (LootArea[ColumnIndex, i].GetComponent<PlayingCards>().Suit == suit && LootArea[ColumnIndex, i].GetComponent<PlayingCards>().Ranking != 13)
                     {
-                        LootArea[ColumnIndex, i].GetComponent<PlayingCards>().StartMoving(TargetDummyLocation);
+                        LootArea[ColumnIndex, i].GetComponent<PlayingCards>().StartMoving(DummyClaimedCardLocation.position);
                         LootArea[ColumnIndex, i].GetComponent<PlayingCards>().CurrentCol = -3;
                         CardsClaimedByDummy.Add(LootArea[ColumnIndex, i]);
                         LootArea[ColumnIndex, i] = null;
@@ -543,11 +562,28 @@ public class GameStateManager : MonoBehaviour
                     }
                 }
 
-
-
             }
             else if (ColumnIndex == 4)
             {
+                if (KingsInTheUnwanted.Count != 0)
+                {
+                    foreach (GameObject kingCard in KingsInTheUnwanted)
+                    {
+                        if (kingCard.GetComponent<PlayingCards>().Suit == suit)
+                        {
+                            kingCard.GetComponent<PlayingCards>().CurrentCol = -2;
+                            kingCard.GetComponent<PlayingCards>().StartMoving(ClaimedKings.position);
+                            KingsInTheUnwanted.Remove(kingCard);
+                            KingsClaimedByDummy.Add(kingCard);
+                            break;
+                        }
+                    }
+                }
+
+                while (DummyClaimFormTheUnwanted(suit))
+                {
+
+                }
                 // dummy claim cards from the unwanted
             }
         }
@@ -575,6 +611,67 @@ public class GameStateManager : MonoBehaviour
         unwantedStack[thinestStackIndex].Push(card);
         return thinestStackIndex;
     }
+
+    public bool ClaimFromTheUnwanted(int suit, bool player, GameObject thisCard)
+    {
+        if (thisCard != null)
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                if (unwantedStack[i].Count != 0)
+                {
+                    if (unwantedStack[i].Peek() == thisCard)
+                    {
+
+                        unwantedStack[i].Peek().GetComponent<PlayingCards>().StartMoving(PlayerClaimedCardLocation.position);
+                        CardsClaimedByPlayer.Add(unwantedStack[i].Pop());
+                        if (unwantedStack[i].Count != 0)
+                        {
+                            unwantedStack[i].Peek().SetActive(true);
+                        }
+
+                    }
+                }
+
+            }
+        }
+        for (int i = 0; i < 4; i++)
+        {
+            if (unwantedStack[i].Count != 0)
+            {
+                if (unwantedStack[i].Peek().GetComponent<PlayingCards>().Suit == suit)
+                {
+
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public bool DummyClaimFormTheUnwanted(int suit)
+    {
+        for (int i = 0; i < 4; i++)
+        {
+            if (unwantedStack[i].Count != 0)
+            {
+                if (unwantedStack[i].Peek().GetComponent<PlayingCards>().Suit == suit)
+                {
+                    unwantedStack[i].Peek().GetComponent<PlayingCards>().CurrentCol = -2;
+                    unwantedStack[i].Peek().GetComponent<PlayingCards>().StartMoving(DummyClaimedCardLocation.position);
+                    CardsClaimedByDummy.Add(unwantedStack[i].Pop());
+                    if (unwantedStack[i].Count != 0)
+                    {
+                        unwantedStack[i].Peek().SetActive(true);
+                    }
+
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
 
     //refresh the color of card to show the card dummy is going to take based on current situation
     public void RefreshDummyAI()
