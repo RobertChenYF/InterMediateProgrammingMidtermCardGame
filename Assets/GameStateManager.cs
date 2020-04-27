@@ -36,15 +36,23 @@ public class GameStateManager : MonoBehaviour
     public Transform DummyClaimedCardLocation;
     public Transform UnwantedKingLocation;
     public Transform ClaimedKings;
+    public Transform DummyActionDiscardPile;
+    public Transform UnwantedPile;
+    public Transform LootPile;
 
     public static int SuitFromTheUnwantedPlayerChoose = -1;
 
     public static int highlightSuit = 0;
     public static int highlightCol = -1;
-
+    public float gapBetweenCloumn;
     public static bool canInteract = false;
 
     public static bool SelectedCard = false;
+
+    public static int CurrentDisplayCard;
+    public Transform[] currentLyShowedDeck;
+    public static List<GameObject> displayedCard;
+    public GameObject backGroundWindow;
     // Start is called before the first frame update
     void Start()
     {
@@ -64,6 +72,7 @@ public class GameStateManager : MonoBehaviour
         CardsClaimedByPlayer = new List<GameObject>();
         KingsClaimedByDummy = new List<GameObject>();
         cardsReadyToBEPickedByDummy = new List<GameObject>();
+        displayedCard = new List<GameObject>();
         LootArea = new GameObject[4, 4];
         ChangeState(new Setup(this));
 
@@ -162,7 +171,7 @@ public class GameStateManager : MonoBehaviour
             int randomIndex = Random.Range(0, unusedTopDeck.Count);
             unusedTopDeck[randomIndex].SetActive(true);
             LootArea[minimumEmptySpaceCol, minimumEmptySpaceRow] = unusedTopDeck[randomIndex];
-            unusedTopDeck[randomIndex].GetComponent<PlayingCards>().StartMoving(new Vector3(-2.55f + 2.0f * minimumEmptySpaceCol, 2.38f - 1f * minimumEmptySpaceRow, 0 + minimumEmptySpaceRow * 0.1f));
+            unusedTopDeck[randomIndex].GetComponent<PlayingCards>().StartMoving(new Vector3(LootPile.position.x + gapBetweenCloumn * minimumEmptySpaceCol, LootPile.position.y - 1f * minimumEmptySpaceRow, 0 + minimumEmptySpaceRow * 0.1f));
             unusedTopDeck[randomIndex].GetComponent<PlayingCards>().orderInLayer = minimumEmptySpaceRow;
             unusedTopDeck[randomIndex].GetComponent<PlayingCards>().CurrentCol = minimumEmptySpaceCol;
             unusedTopDeck.RemoveAt(randomIndex);
@@ -180,17 +189,18 @@ public class GameStateManager : MonoBehaviour
 
         if (unusedBottomDeck.Count == 0)
         {
-            foreach(GameObject card in usedBottomDeck) {
+            foreach (GameObject card in usedBottomDeck)
+            {
                 unusedBottomDeck.Add(card);
             }
-            
+
             usedBottomDeck.Clear();
         }
 
         int randomIndex = Random.Range(0, unusedBottomDeck.Count);
         DummyActiveCard = unusedBottomDeck[randomIndex];
         DummyActiveCard.SetActive(true);
-        DummyActiveCard.GetComponent<PlayingCards>().StartMoving(new Vector3(-8.5f, -2.5f, 0));
+        DummyActiveCard.GetComponent<PlayingCards>().StartMoving(DummyActionDiscardPile.position);
         usedBottomDeck.Add(unusedBottomDeck[randomIndex]);
         unusedBottomDeck.RemoveAt(randomIndex);
     }
@@ -490,8 +500,7 @@ public class GameStateManager : MonoBehaviour
     public void ClaimCard(int suit, int ColumnIndex, bool Player)
     {
 
-        Vector3 TargetPlayerLocation = new Vector3(6.58f, -3.72f, 0);
-        Vector3 KingArea = new Vector3(9.62f, -0.65f, 0);
+        
         if (Player)
         {
             if (ColumnIndex < 4) // claim fro the loot
@@ -510,7 +519,7 @@ public class GameStateManager : MonoBehaviour
                     else if (LootArea[ColumnIndex, i].GetComponent<PlayingCards>().Suit != suit && LootArea[ColumnIndex, i].GetComponent<PlayingCards>().Ranking != 13)
                     {
                         int stackIndex = AddToTheUnwanted(LootArea[ColumnIndex, i]);
-                        LootArea[ColumnIndex, i].GetComponent<PlayingCards>().StartMoving(new Vector3(2 * stackIndex, -3.41f, 0));
+                        LootArea[ColumnIndex, i].GetComponent<PlayingCards>().StartMoving(new Vector3(UnwantedPile.position.x + gapBetweenCloumn * stackIndex, UnwantedPile.position.y, 0));
                         LootArea[ColumnIndex, i].GetComponent<PlayingCards>().orderInLayer = 2;
                         LootArea[ColumnIndex, i].GetComponent<PlayingCards>().CurrentCol = 4;
                         LootArea[ColumnIndex, i] = null;
@@ -532,7 +541,7 @@ public class GameStateManager : MonoBehaviour
         }
         else //dummy claim
         {
-            if (ColumnIndex < 4) // claim fro the loot
+            if (ColumnIndex < 4) // claim from the loot
             {
 
                 for (int i = 3; i >= 0; i--)
@@ -548,14 +557,14 @@ public class GameStateManager : MonoBehaviour
                     else if (LootArea[ColumnIndex, i].GetComponent<PlayingCards>().Suit != suit && LootArea[ColumnIndex, i].GetComponent<PlayingCards>().Ranking != 13)
                     {
                         int stackIndex = AddToTheUnwanted(LootArea[ColumnIndex, i]);
-                        LootArea[ColumnIndex, i].GetComponent<PlayingCards>().StartMoving(new Vector3(2 * stackIndex, -3.41f, 0));
+                        LootArea[ColumnIndex, i].GetComponent<PlayingCards>().StartMoving(new Vector3(UnwantedPile.position.x + gapBetweenCloumn * stackIndex, UnwantedPile.position.y, 0));
                         LootArea[ColumnIndex, i].GetComponent<PlayingCards>().orderInLayer = 2;
                         LootArea[ColumnIndex, i].GetComponent<PlayingCards>().CurrentCol = 4;
                         LootArea[ColumnIndex, i] = null;
                     }
                     else if (LootArea[ColumnIndex, i].GetComponent<PlayingCards>().Ranking == 13)
                     {
-                        LootArea[ColumnIndex, i].GetComponent<PlayingCards>().StartMoving(KingArea);
+                        LootArea[ColumnIndex, i].GetComponent<PlayingCards>().StartMoving(UnwantedKingLocation.position);
                         LootArea[ColumnIndex, i].GetComponent<PlayingCards>().CurrentCol = 4;
                         KingsInTheUnwanted.Add(LootArea[ColumnIndex, i]);
                         LootArea[ColumnIndex, i] = null;
@@ -697,7 +706,7 @@ public class GameStateManager : MonoBehaviour
                 }
             }
         }
-        CardsClaimedByDummy.Clear();
+        
         cardsReadyToBEPickedByDummy = DummyAI();
         if (cardsReadyToBEPickedByDummy.Count == 0)
         {
@@ -715,4 +724,31 @@ public class GameStateManager : MonoBehaviour
 
 
     }
+
+    public void CloseWindow()
+    {
+        if (displayedCard.Count != 0 && CurrentDisplayCard != -1)
+        {
+            foreach (GameObject card in displayedCard)
+            {
+                card.transform.position = currentLyShowedDeck[CurrentDisplayCard].position;
+                card.GetComponent<PlayingCards>().orderInLayer -= 11;
+                card.transform.localScale = new Vector3(1,1,1);
+                if (CurrentDisplayCard!=1 && CurrentDisplayCard != 2&&CurrentDisplayCard != 3 && CurrentDisplayCard != 6 && CurrentDisplayCard != 5)
+                {
+                    card.SetActive(false);
+                }
+                
+            }
+            displayedCard.Clear();
+            CurrentDisplayCard = -1;
+            backGroundWindow.SetActive(false);
+            canInteract = true;
+        }
+        //move all card back
+        //disable the cardif necessaaey
+        //resetLayorder
+
+    }
+
 }
