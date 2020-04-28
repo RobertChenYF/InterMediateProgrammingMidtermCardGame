@@ -1,12 +1,15 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 
 public class DisplayAllCardInDeck : MonoBehaviour
 {
     public List<GameObject> ThisDeck;
     public GameObject backGround;
     public Transform FirstCard;
+    public TextMeshProUGUI PileName;
     public int PileCode = -1;
     public Color Disabled;
     public Color Abled; 
@@ -76,9 +79,9 @@ public class DisplayAllCardInDeck : MonoBehaviour
         GameStateManager.CurrentDisplayCard = PileCode;
         foreach (GameObject card in ThisDeck)
         {
-            card.transform.localScale =new Vector3  (0.8f,0.8f,1); 
-            
+            card.transform.localScale =new Vector3  (0.8f,0.8f,1);
 
+            PileName.text = GameObject.Find("GameStateManager").GetComponent<GameStateManager>().PileNames[GameStateManager.CurrentDisplayCard];
             card.transform.position = new Vector3(FirstCard.position.x+(count%10)*1.6f,- (int)(count/10)*2+FirstCard.position.y,0);
             GameStateManager.displayedCard.Add(card);
             card.GetComponent<PlayingCards>().orderInLayer +=11;
@@ -88,4 +91,6 @@ public class DisplayAllCardInDeck : MonoBehaviour
             card.SetActive(true);
         }
     }
+
+
 }

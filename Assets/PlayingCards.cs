@@ -102,6 +102,10 @@ public class PlayingCards : MonoBehaviour
 
             currentColor = highlightColor;
         }
+        else if (GameStateManager.specialSituation && GameObject.Find("GameStateManager").GetComponent<GameStateManager>().CardsClaimedByDummy.Contains(gameObject))
+        {
+            currentColor = highlightColor;
+        }
         
     }
     private void OnMouseExit()
@@ -112,7 +116,10 @@ public class PlayingCards : MonoBehaviour
             GameStateManager.highlightCol = -1;
             currentColor = unhighlishtedColor;
         }
-       
+       else if (GameStateManager.specialSituation)
+        {
+            currentColor = unhighlishtedColor;
+        }
         
     }
     public void StartMoving(Vector3 TargetLocation)
@@ -149,6 +156,15 @@ public class PlayingCards : MonoBehaviour
 
              }
             
+        }
+        else if(GameStateManager.specialSituation && GameObject.Find("GameStateManager").GetComponent<GameStateManager>().CardsClaimedByDummy.Contains(gameObject))
+        {
+            unhighlishtedColor = white;
+            currentColor = unhighlishtedColor;
+            GameStateManager.specialSituation = false;
+            StartMoving(GameObject.Find("GameStateManager").GetComponent<GameStateManager>().PlayerClaimedCardLocation.position);
+            GameObject.Find("GameStateManager").GetComponent<GameStateManager>().CardsClaimedByPlayer.Add(gameObject);
+            GameObject.Find("GameStateManager").GetComponent<GameStateManager>().CardsClaimedByDummy.Remove(gameObject);
         }
         Debug.Log(cardCode);
     }

@@ -125,10 +125,15 @@ public class DummyTurn : GameState
         
         
        
-        if (gameObjects.Count == 0)
+        if (gameObjects.Count == 0 && gameStateManager.CardsClaimedByDummy.Count>0)
         {
-            //nothing to do let player pick a card
+            gameStateManager.ChangeState(new PlayerPickFromDummyCard(gameStateManager));
             Debug.Log("cannot take any cards");
+        }
+        else if (gameObjects.Count == 0 && gameStateManager.CardsClaimedByDummy.Count == 0)
+        {
+            gameStateManager.ChangeState(new Refill(gameStateManager));
+            Debug.Log("cannot take any cards, but there is not card for player to take");
         }
         else
         {
@@ -175,7 +180,38 @@ public class DummyTurn : GameState
     }
 }
 
+public class PlayerPickFromDummyCard : GameState
+{
 
+    
+    public PlayerPickFromDummyCard(GameStateManager theGameStateManager) : base(theGameStateManager)
+    {
+
+    }
+
+    public override void stateBehavior()
+    {
+
+        if (GameStateManager.specialSituation == false)// after player pick a card go to the refill state
+        {
+            gameStateManager.ChangeState(new Refill(gameStateManager));
+        }
+    }
+
+
+    public override void Enter()
+    {
+        base.Enter();
+        GameStateManager.specialSituation = true;
+        gameStateManager.OpenPlayerPickWindow();
+    }
+
+    public override void Leave()
+    {
+        base.Leave();
+        gameStateManager.closePlayerPickWindow();
+    }
+}
 public class EndGameState : GameState
 {
     public EndGameState(GameStateManager theGameStateManager) : base(theGameStateManager)
@@ -186,7 +222,13 @@ public class EndGameState : GameState
 
     public override void stateBehavior()
     {
-        throw new System.NotImplementedException();
+        
+    }
+
+    public override void Enter()
+    {
+        base.Enter();
+        gameStateManager.GameEndScreen();
     }
 }
 

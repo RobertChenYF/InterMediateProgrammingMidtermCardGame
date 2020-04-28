@@ -1,9 +1,15 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
+
 
 public class GameStateManager : MonoBehaviour
 {
+    public TextMeshProUGUI PileName;
+    public GameObject exitButton;
+    public GameObject backGround;
     public Sprite[] cardImage;
     private GameState currentGameState;
     [SerializeField] private GameObject playingCard;
@@ -39,6 +45,9 @@ public class GameStateManager : MonoBehaviour
     public Transform DummyActionDiscardPile;
     public Transform UnwantedPile;
     public Transform LootPile;
+    public Transform FirstCardOfTheWindow;
+
+    public string[] PileNames;
 
     public static int SuitFromTheUnwantedPlayerChoose = -1;
 
@@ -53,6 +62,8 @@ public class GameStateManager : MonoBehaviour
     public Transform[] currentLyShowedDeck;
     public static List<GameObject> displayedCard;
     public GameObject backGroundWindow;
+
+    public static bool specialSituation; 
     // Start is called before the first frame update
     void Start()
     {
@@ -327,13 +338,13 @@ public class GameStateManager : MonoBehaviour
         //go through all the column listed, if there is one column with the most amount of that suit return the column index(0-4) 4 stands for the unwanted
         if (whichColumnsToEnter.Count == 0)
         {
-            Debug.Log("columns avaiable is too short");
+          //  Debug.Log("columns avaiable is too short");
             return -1; //return -1 if cannot make a valid move;
 
         }
         else if (whichColumnsToEnter.Count == 1)
         {
-            Debug.Log("columns avaiable is 1 length");
+           // Debug.Log("columns avaiable is 1 length");
             return whichColumnsToEnter[0]; // return the choice if there is only one walid choice
         }
         else
@@ -361,18 +372,18 @@ public class GameStateManager : MonoBehaviour
             if (highestAmountOfSuit == 0)
             {
                 //novalid move
-                Debug.Log("all have no suits ");
+               // Debug.Log("all have no suits ");
                 return -1;
             }
             else if (highestAmountOfSuitIndex.Count == 1)
             {
                 //we have a column that have the most amout of suit;
-                Debug.Log("one column has more suit");
+               // Debug.Log("one column has more suit");
                 return (highestAmountOfSuitIndex[0]);
             }
             else
             {
-                Debug.Log("check ranking");
+                //Debug.Log("check ranking");
                 //return the column with the highest ranking of that card 
                 return RankingOfColumn(suit, highestAmountOfSuitIndex);
             }
@@ -603,7 +614,7 @@ public class GameStateManager : MonoBehaviour
     {
         int thinestStackIndex = 0;
         int LowestAmountOfCard = unwantedStack[0].Count;
-        Debug.Log(unwantedStack[0].Count);
+       // Debug.Log(unwantedStack[0].Count);
         for (int i = 1; i < 4; i++)
         {
             if (unwantedStack[i].Count < LowestAmountOfCard)
@@ -751,4 +762,64 @@ public class GameStateManager : MonoBehaviour
 
     }
 
+    public void OpenPlayerPickWindow()
+    {
+        GameStateManager.canInteract = false;
+        backGround.SetActive(true);
+        exitButton.SetActive(false);
+        PileName.text = "Dummy cannot make a valid move. Pick a card from all cards it claimed as a bonus.";
+        int count = 0;
+        GameStateManager.CurrentDisplayCard = 2;
+        foreach (GameObject card in CardsClaimedByDummy)
+        {
+            card.transform.localScale = new Vector3(0.8f, 0.8f, 1); 
+            card.transform.position = new Vector3(FirstCardOfTheWindow.position.x + (count % 10) * 1.6f, -(int)(count / 10) * 2 + FirstCardOfTheWindow.position.y, 0);
+            GameStateManager.displayedCard.Add(card);
+            card.GetComponent<PlayingCards>().orderInLayer += 11;
+            count++;
+            card.SetActive(true);
+        }
+    }
+
+    public void closePlayerPickWindow()
+    {
+        if (displayedCard.Count != 0 && CurrentDisplayCard != -1)
+        {
+            foreach (GameObject card in displayedCard)
+            {
+                card.transform.position = currentLyShowedDeck[CurrentDisplayCard].position;
+                card.GetComponent<PlayingCards>().orderInLayer -= 11;
+                card.transform.localScale = new Vector3(1, 1, 1);
+                if (CurrentDisplayCard != 1 && CurrentDisplayCard != 2 && CurrentDisplayCard != 3 && CurrentDisplayCard != 6 && CurrentDisplayCard != 5)
+                {
+                    card.SetActive(false);
+                }
+
+            }
+            displayedCard.Clear();
+            CurrentDisplayCard = -1;
+            exitButton.SetActive(true);
+            backGroundWindow.SetActive(false);
+            
+        }
+    }
+
+    public void GameEndScreen()
+    {
+        GameStateManager.canInteract = false;
+        backGround.SetActive(true);
+        exitButton.SetActive(false);
+        PileName.text = "Game End";
+        int count = 0;
+        GameStateManager.CurrentDisplayCard = 6;
+        foreach (GameObject card in CardsClaimedByPlayer)
+        {
+            card.transform.localScale = new Vector3(0.8f, 0.8f, 1);
+            card.transform.position = new Vector3(FirstCardOfTheWindow.position.x + (count % 10) * 1.6f, -(int)(count / 10) * 2 + FirstCardOfTheWindow.position.y, 0);
+            GameStateManager.displayedCard.Add(card);
+            card.GetComponent<PlayingCards>().orderInLayer += 11;
+            count++;
+            card.SetActive(true);
+        }
+    }
 }
