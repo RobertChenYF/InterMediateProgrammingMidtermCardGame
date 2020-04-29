@@ -63,7 +63,11 @@ public class GameStateManager : MonoBehaviour
     public static List<GameObject> displayedCard;
     public GameObject backGroundWindow;
 
-    public static bool specialSituation; 
+    public static bool specialSituation;
+
+    public TextMeshProUGUI Score;
+
+    private int[] scoreForStraight;
     // Start is called before the first frame update
     void Start()
     {
@@ -87,7 +91,7 @@ public class GameStateManager : MonoBehaviour
         LootArea = new GameObject[4, 4];
         ChangeState(new Setup(this));
 
-
+        scoreForStraight = new int[] { 0, 0, 0, 3, 7, 12, 18, 25, 33, 42, 52 };
     }
 
     // Update is called once per frame
@@ -147,6 +151,7 @@ public class GameStateManager : MonoBehaviour
     //refill card to the loot;
     public bool DealCardToLoot()
     {
+        CardsClaimedByDummy.Sort(SortByCardCode);
         bool fullLoot = true;
         int minimumEmptySpaceCol = -99;
         int minimumEmptySpaceRow = -99;
@@ -607,6 +612,9 @@ public class GameStateManager : MonoBehaviour
                 // dummy claim cards from the unwanted
             }
         }
+
+
+        RefreshScore();
     }
 
     //adding cards to the unwanted after the claim
@@ -645,6 +653,7 @@ public class GameStateManager : MonoBehaviour
 
                         unwantedStack[i].Peek().GetComponent<PlayingCards>().StartMoving(PlayerClaimedCardLocation.position);
                         CardsClaimedByPlayer.Add(unwantedStack[i].Pop());
+                        RefreshScore();
                         if (unwantedStack[i].Count != 0)
                         {
                             unwantedStack[i].Peek().SetActive(true);
@@ -821,5 +830,52 @@ public class GameStateManager : MonoBehaviour
             count++;
             card.SetActive(true);
         }
+    }
+
+    public int CalculateScore()//calculate the score based for the longest straight flush for each suit;
+    {
+        bool[,] ifCardCollected = new bool[4, 10];//default false
+        
+        
+        foreach (GameObject card in CardsClaimedByPlayer)
+        {
+            ifCardCollected[card.GetComponent<PlayingCards>().Suit - 1, card.GetComponent<PlayingCards>().Ranking - 1] = true;
+        }
+
+
+        return CardsClaimedByPlayer.Count + scoreForStraight[getMaxLength(ifCardCollected, 0)] + scoreForStraight[getMaxLength(ifCardCollected, 1)]
+            + scoreForStraight[getMaxLength(ifCardCollected, 2)] + scoreForStraight[getMaxLength(ifCardCollected, 3)]; //each card count as one point + the score for the straight flush
+    }
+
+    public void RefreshScore()
+    {
+        CardsClaimedByPlayer.Sort(SortByCardCode);
+        Score.text = "Score: " + CalculateScore();
+    }
+    static int SortByCardCode(GameObject card1, GameObject card2)
+    {
+        return card1.GetComponent<PlayingCards>().cardCode.CompareTo(card2.GetComponent<PlayingCards>().cardCode);
+    }
+
+    static int getMaxLength(bool[,] array, int a)//get the longest consecutive true in anarray
+    {
+
+        int count = 0; 
+        int result = 0; 
+
+        for (int i = 0; i < 10; i++)
+        {
+
+            if (array[a,i] == false)
+                count = 0;
+
+            else
+            {
+                count++; 
+                result = Mathf.Max(result, count);
+            }
+        }
+
+        return result;
     }
 }

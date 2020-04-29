@@ -18,10 +18,10 @@ public class PlayingCards : MonoBehaviour
     public int cardCode;
     public Sprite cardImage;
     public int orderInLayer;
-    private Vector3 lerpLocation;
-    private bool Move = false;
-    private float lerpFloat = 0;
-    private Vector3 CurrentPosition;
+    
+    
+    
+    
     public int CurrentCol = -2;
     public bool readyToBePickedByDummy = false;
     // Start is called before the first frame update
@@ -51,19 +51,7 @@ public class PlayingCards : MonoBehaviour
         {
             unhighlishtedColor = white;
         }
-        if (Move)
-        {
-            if (lerpFloat <= 1)
-            {
-                transform.position = Vector3.Lerp(CurrentPosition,lerpLocation,lerpFloat);
-                lerpFloat += Time.deltaTime;
-            }
-            else
-            {
-                Move = false;
-            }
-            
-        }
+       
 
         if (GameStateManager.canInteract && CurrentCol >= 0 && Ranking != 13)
         {
@@ -126,11 +114,21 @@ public class PlayingCards : MonoBehaviour
     {
         readyToBePickedByDummy = false;
         currentColor = white;
-        lerpLocation = TargetLocation;
-        Move = true;
-        lerpFloat = 0;
-        CurrentPosition = transform.position;
+        StartCoroutine(MoveToLocation(transform.position,TargetLocation));
     }
+    IEnumerator MoveToLocation(Vector3 startPosition, Vector3 targetPosition)
+    {
+        float lerpFloat = 0;
+        while (lerpFloat < 1)
+        {
+        lerpFloat += Time.deltaTime;
+        transform.position = Vector3.Lerp(startPosition, targetPosition, lerpFloat);
+        yield return null;
+        }
+        
+        
+    }
+
     private void OnMouseDown()
     {
         if (Ranking != 13 && CurrentCol>-1 && CurrentCol<4 && GameStateManager.canInteract && highlightColor != red)
@@ -164,6 +162,7 @@ public class PlayingCards : MonoBehaviour
             GameStateManager.specialSituation = false;
             StartMoving(GameObject.Find("GameStateManager").GetComponent<GameStateManager>().PlayerClaimedCardLocation.position);
             GameObject.Find("GameStateManager").GetComponent<GameStateManager>().CardsClaimedByPlayer.Add(gameObject);
+            gameStateManager.GetComponent<GameStateManager>().RefreshScore();
             GameObject.Find("GameStateManager").GetComponent<GameStateManager>().CardsClaimedByDummy.Remove(gameObject);
         }
         Debug.Log(cardCode);
