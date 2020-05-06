@@ -86,6 +86,7 @@ public class PlayerTurn : GameState
     {
         if (GameStateManager.SelectedCard == true)
         {
+            GameStateManager.canInteract = false;
             gameStateManager.RefreshDummyAI();
             if (GameStateManager.timer<0)
             {

@@ -49,6 +49,7 @@ public class GameStateManager : MonoBehaviour
 
     public string[] PileNames;
 
+
     public static int SuitFromTheUnwantedPlayerChoose = -1;
 
     public static int highlightSuit = 0;
@@ -68,6 +69,9 @@ public class GameStateManager : MonoBehaviour
     public TextMeshProUGUI Score;
 
     private int[] scoreForStraight;
+
+    public Button skipTurn;
+    public GameObject skipTurnButton;
     // Start is called before the first frame update
     void Start()
     {
@@ -92,6 +96,7 @@ public class GameStateManager : MonoBehaviour
         ChangeState(new Setup(this));
 
         scoreForStraight = new int[] { 0, 0, 0, 3, 7, 12, 18, 25, 33, 42, 52 };
+        skipTurn.onClick.AddListener(skipPlayerTurn);
     }
 
     // Update is called once per frame
@@ -102,10 +107,26 @@ public class GameStateManager : MonoBehaviour
         {
             timer -= Time.deltaTime;
         }
-
-
+        if (canInteract == true)
+        {
+            skipTurnButton.SetActive(true);
+        }
+        else
+        {
+            skipTurnButton.SetActive(false);
+        }
     }
 
+
+    public void skipPlayerTurn()
+    {
+        if (SelectedCard == false)
+        {
+        SelectedCard = true;
+        timer = 2;
+        }
+        
+    }
     public void ChangeState(GameState newGameState)
     {
         if (currentGameState != null) currentGameState.Leave();
@@ -652,6 +673,7 @@ public class GameStateManager : MonoBehaviour
                     {
 
                         unwantedStack[i].Peek().GetComponent<PlayingCards>().StartMoving(PlayerClaimedCardLocation.position);
+                        unwantedStack[i].Peek().GetComponent<PlayingCards>().CurrentCol = -2;
                         CardsClaimedByPlayer.Add(unwantedStack[i].Pop());
                         RefreshScore();
                         if (unwantedStack[i].Count != 0)
