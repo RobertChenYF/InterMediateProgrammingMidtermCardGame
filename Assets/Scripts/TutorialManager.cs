@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class TutorialManager : MonoBehaviour
 {
+    public bool TutorialOn = true;
     void Awake()
     {
         Random.InitState(0);
@@ -17,6 +18,13 @@ public class TutorialManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if (TutorialOn)
+        {
+            Time.timeScale = 0;
+        }
+        else
+        {
+            Time.timeScale = 1;
+        }
     }
 }
