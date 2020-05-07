@@ -76,6 +76,7 @@ public class GameStateManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+       
         unusedTopDeck = new List<GameObject>();
         unusedBottomDeck = new List<GameObject>();
         usedBottomDeck = new List<GameObject>();
@@ -161,15 +162,42 @@ public class GameStateManager : MonoBehaviour
                 }
                 else if (j == 13)
                 {
-                    unusedTopDeck.Add(currentCard);
+                    unusedKings.Add(currentCard);
                     currentCard.transform.position = TopDeckTransform.position;
                     currentCard.SetActive(false);
                 }
 
             }
         }
+        unusedTopDeck = ShuffleCards(unusedTopDeck);
+        unusedKings = ShuffleCards(unusedKings);
+        //insert all the kings
+        unusedTopDeck.Insert(Random.Range(0, 9), unusedKings[0]);
+        unusedTopDeck.Insert(Random.Range(11, 20), unusedKings[1]);
+        unusedTopDeck.Insert(Random.Range(22, 31), unusedKings[2]);
+        unusedTopDeck.Insert(Random.Range(33, 42), unusedKings[3]);
+        unusedKings.Clear();
+        unusedBottomDeck = ShuffleCards(unusedBottomDeck);
     }
 
+
+    public List<GameObject> ShuffleCards(List<GameObject> Deck)
+    {
+
+        GameObject tempCard;
+
+        int n = Deck.Count;
+        for (int i = 0; i < n; i++)
+        {
+            
+            int r = (int)(Random.Range(0,n-1));
+            tempCard = Deck[r];
+            Deck[r] = Deck[i];
+            Deck[i] = tempCard;
+        }
+
+        return Deck;
+    }
     //refill card to the loot;
     public bool DealCardToLoot()
     {
@@ -206,13 +234,13 @@ public class GameStateManager : MonoBehaviour
         }
         else
         {
-            int randomIndex = Random.Range(0, unusedTopDeck.Count);
-            unusedTopDeck[randomIndex].SetActive(true);
-            LootArea[minimumEmptySpaceCol, minimumEmptySpaceRow] = unusedTopDeck[randomIndex];
-            unusedTopDeck[randomIndex].GetComponent<PlayingCards>().StartMoving(new Vector3(LootPile.position.x + gapBetweenCloumn * minimumEmptySpaceCol, LootPile.position.y - 1f * minimumEmptySpaceRow, 0 + minimumEmptySpaceRow * 0.1f));
-            unusedTopDeck[randomIndex].GetComponent<PlayingCards>().orderInLayer = minimumEmptySpaceRow;
-            unusedTopDeck[randomIndex].GetComponent<PlayingCards>().CurrentCol = minimumEmptySpaceCol;
-            unusedTopDeck.RemoveAt(randomIndex);
+            
+            unusedTopDeck[0].SetActive(true);
+            LootArea[minimumEmptySpaceCol, minimumEmptySpaceRow] = unusedTopDeck[0];
+            unusedTopDeck[0].GetComponent<PlayingCards>().StartMoving(new Vector3(LootPile.position.x + gapBetweenCloumn * minimumEmptySpaceCol, LootPile.position.y - 1f * minimumEmptySpaceRow, 0 + minimumEmptySpaceRow * 0.1f));
+            unusedTopDeck[0].GetComponent<PlayingCards>().orderInLayer = minimumEmptySpaceRow;
+            unusedTopDeck[0].GetComponent<PlayingCards>().CurrentCol = minimumEmptySpaceCol;
+            unusedTopDeck.RemoveAt(0);
             return true;
         }
     }
@@ -230,17 +258,18 @@ public class GameStateManager : MonoBehaviour
             foreach (GameObject card in usedBottomDeck)
             {
                 unusedBottomDeck.Add(card);
-            }
 
+            }
+            unusedBottomDeck = ShuffleCards(unusedBottomDeck);
             usedBottomDeck.Clear();
         }
 
-        int randomIndex = Random.Range(0, unusedBottomDeck.Count);
-        DummyActiveCard = unusedBottomDeck[randomIndex];
+        
+        DummyActiveCard = unusedBottomDeck[0];
         DummyActiveCard.SetActive(true);
         DummyActiveCard.GetComponent<PlayingCards>().StartMoving(DummyActionDiscardPile.position);
         AddToList(DummyActiveCard,usedBottomDeck);
-        unusedBottomDeck.RemoveAt(randomIndex);
+        unusedBottomDeck.RemoveAt(0);
     }
 
     //Dummy's AI determine dummy's action
