@@ -161,7 +161,7 @@ public class PlayingCards : MonoBehaviour
             currentColor = unhighlishtedColor;
             GameStateManager.specialSituation = false;
             StartMoving(GameObject.Find("GameStateManager").GetComponent<GameStateManager>().PlayerClaimedCardLocation.position);
-            GameObject.Find("GameStateManager").GetComponent<GameStateManager>().CardsClaimedByPlayer.Add(gameObject);
+            GameObject.Find("GameStateManager").GetComponent<GameStateManager>().AddToList(gameObject, GameObject.Find("GameStateManager").GetComponent<GameStateManager>().CardsClaimedByPlayer);
             gameStateManager.GetComponent<GameStateManager>().RefreshScore();
             GameObject.Find("GameStateManager").GetComponent<GameStateManager>().CardsClaimedByDummy.Remove(gameObject);
         }

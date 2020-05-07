@@ -72,6 +72,7 @@ public class GameStateManager : MonoBehaviour
 
     public Button skipTurn;
     public GameObject skipTurnButton;
+    public GameObject GameEndButton;
     // Start is called before the first frame update
     void Start()
     {
@@ -219,10 +220,10 @@ public class GameStateManager : MonoBehaviour
     //flip a new action card for dummy;
     public void FlipANewDummyActiveCard()
     {
-        if (DummyActiveCard != null)
-        {
-            DummyActiveCard.SetActive(false);
-        }
+      //  if (DummyActiveCard != null)
+      //  {
+       //     DummyActiveCard.SetActive(false);
+      //  }
 
         if (unusedBottomDeck.Count == 0)
         {
@@ -238,7 +239,7 @@ public class GameStateManager : MonoBehaviour
         DummyActiveCard = unusedBottomDeck[randomIndex];
         DummyActiveCard.SetActive(true);
         DummyActiveCard.GetComponent<PlayingCards>().StartMoving(DummyActionDiscardPile.position);
-        usedBottomDeck.Add(unusedBottomDeck[randomIndex]);
+        AddToList(DummyActiveCard,usedBottomDeck);
         unusedBottomDeck.RemoveAt(randomIndex);
     }
 
@@ -549,15 +550,26 @@ public class GameStateManager : MonoBehaviour
                     {
                         LootArea[ColumnIndex, i].GetComponent<PlayingCards>().StartMoving(PlayerClaimedCardLocation.position);
                         LootArea[ColumnIndex, i].GetComponent<PlayingCards>().CurrentCol = -3;
-                        CardsClaimedByPlayer.Add(LootArea[ColumnIndex, i]);
+                        
+                        AddToList(LootArea[ColumnIndex, i],CardsClaimedByPlayer);
                         LootArea[ColumnIndex, i] = null;
 
                     }
                     else if (LootArea[ColumnIndex, i].GetComponent<PlayingCards>().Suit != suit && LootArea[ColumnIndex, i].GetComponent<PlayingCards>().Ranking != 13)
                     {
                         int stackIndex = AddToTheUnwanted(LootArea[ColumnIndex, i]);
-                        LootArea[ColumnIndex, i].GetComponent<PlayingCards>().StartMoving(new Vector3(UnwantedPile.position.x + gapBetweenCloumn * stackIndex, UnwantedPile.position.y, 0));
-                        LootArea[ColumnIndex, i].GetComponent<PlayingCards>().orderInLayer = 2;
+                        LootArea[ColumnIndex, i].GetComponent<PlayingCards>().StartMoving(new Vector3(UnwantedPile.position.x + gapBetweenCloumn * stackIndex, UnwantedPile.position.y + unwantedStack[stackIndex].Count * 0.05f, 0));
+                        if (unwantedStack[stackIndex].Count > 1)
+                        {
+                            GameObject tempCard = unwantedStack[stackIndex].Pop();
+                            LootArea[ColumnIndex, i].GetComponent<PlayingCards>().orderInLayer = unwantedStack[stackIndex].Peek().GetComponent<PlayingCards>().orderInLayer + 1;
+                            unwantedStack[stackIndex].Push(tempCard);
+
+                        }
+                        else
+                        {
+                            LootArea[ColumnIndex, i].GetComponent<PlayingCards>().orderInLayer = 1;
+                        }
                         LootArea[ColumnIndex, i].GetComponent<PlayingCards>().CurrentCol = 4;
                         LootArea[ColumnIndex, i] = null;
                     }
@@ -565,7 +577,7 @@ public class GameStateManager : MonoBehaviour
                     {
                         LootArea[ColumnIndex, i].GetComponent<PlayingCards>().StartMoving(UnwantedKingLocation.position);
                         LootArea[ColumnIndex, i].GetComponent<PlayingCards>().CurrentCol = 4;
-                        KingsInTheUnwanted.Add(LootArea[ColumnIndex, i]);
+                        AddToList(LootArea[ColumnIndex, i],KingsInTheUnwanted);
                         LootArea[ColumnIndex, i] = null;
                     }
                 }
@@ -587,15 +599,25 @@ public class GameStateManager : MonoBehaviour
                     {
                         LootArea[ColumnIndex, i].GetComponent<PlayingCards>().StartMoving(DummyClaimedCardLocation.position);
                         LootArea[ColumnIndex, i].GetComponent<PlayingCards>().CurrentCol = -3;
-                        CardsClaimedByDummy.Add(LootArea[ColumnIndex, i]);
+                        AddToList(LootArea[ColumnIndex, i], CardsClaimedByDummy);
                         LootArea[ColumnIndex, i] = null;
 
                     }
                     else if (LootArea[ColumnIndex, i].GetComponent<PlayingCards>().Suit != suit && LootArea[ColumnIndex, i].GetComponent<PlayingCards>().Ranking != 13)
                     {
                         int stackIndex = AddToTheUnwanted(LootArea[ColumnIndex, i]);
-                        LootArea[ColumnIndex, i].GetComponent<PlayingCards>().StartMoving(new Vector3(UnwantedPile.position.x + gapBetweenCloumn * stackIndex, UnwantedPile.position.y, 0));
-                        LootArea[ColumnIndex, i].GetComponent<PlayingCards>().orderInLayer = 2;
+                        LootArea[ColumnIndex, i].GetComponent<PlayingCards>().StartMoving(new Vector3(UnwantedPile.position.x + gapBetweenCloumn * stackIndex, UnwantedPile.position.y+ unwantedStack[stackIndex].Count*0.05f, 0));
+                        if (unwantedStack[stackIndex].Count>1)
+                        {
+                           GameObject tempCard =  unwantedStack[stackIndex].Pop();
+                            LootArea[ColumnIndex, i].GetComponent<PlayingCards>().orderInLayer = unwantedStack[stackIndex].Peek().GetComponent<PlayingCards>().orderInLayer +1;
+                            unwantedStack[stackIndex].Push(tempCard);
+
+                        }
+                        else
+                        {
+                            LootArea[ColumnIndex, i].GetComponent<PlayingCards>().orderInLayer = 1;
+                        }
                         LootArea[ColumnIndex, i].GetComponent<PlayingCards>().CurrentCol = 4;
                         LootArea[ColumnIndex, i] = null;
                     }
@@ -603,7 +625,7 @@ public class GameStateManager : MonoBehaviour
                     {
                         LootArea[ColumnIndex, i].GetComponent<PlayingCards>().StartMoving(UnwantedKingLocation.position);
                         LootArea[ColumnIndex, i].GetComponent<PlayingCards>().CurrentCol = 4;
-                        KingsInTheUnwanted.Add(LootArea[ColumnIndex, i]);
+                        AddToList(LootArea[ColumnIndex, i], KingsInTheUnwanted);
                         LootArea[ColumnIndex, i] = null;
                     }
                 }
@@ -620,7 +642,8 @@ public class GameStateManager : MonoBehaviour
                             kingCard.GetComponent<PlayingCards>().CurrentCol = -2;
                             kingCard.GetComponent<PlayingCards>().StartMoving(ClaimedKings.position);
                             KingsInTheUnwanted.Remove(kingCard);
-                            KingsClaimedByDummy.Add(kingCard);
+                            
+                            AddToList(kingCard, KingsClaimedByDummy);
                             break;
                         }
                     }
@@ -654,7 +677,7 @@ public class GameStateManager : MonoBehaviour
         }
         if (unwantedStack[thinestStackIndex].Count != 0)
         {
-            unwantedStack[thinestStackIndex].Peek().SetActive(false);
+            unwantedStack[thinestStackIndex].Peek().GetComponent<BoxCollider2D>().enabled = false;
         }
 
         unwantedStack[thinestStackIndex].Push(card);
@@ -678,7 +701,7 @@ public class GameStateManager : MonoBehaviour
                         RefreshScore();
                         if (unwantedStack[i].Count != 0)
                         {
-                            unwantedStack[i].Peek().SetActive(true);
+                            unwantedStack[i].Peek().GetComponent<BoxCollider2D>().enabled = true;
                         }
 
                     }
@@ -710,10 +733,11 @@ public class GameStateManager : MonoBehaviour
                 {
                     unwantedStack[i].Peek().GetComponent<PlayingCards>().CurrentCol = -2;
                     unwantedStack[i].Peek().GetComponent<PlayingCards>().StartMoving(DummyClaimedCardLocation.position);
-                    CardsClaimedByDummy.Add(unwantedStack[i].Pop());
+                    
+                    AddToList(unwantedStack[i].Pop(), CardsClaimedByDummy);
                     if (unwantedStack[i].Count != 0)
                     {
-                        unwantedStack[i].Peek().SetActive(true);
+                        unwantedStack[i].Peek().GetComponent<BoxCollider2D>().enabled = true;
                     }
 
                     return true;
@@ -774,7 +798,7 @@ public class GameStateManager : MonoBehaviour
             foreach (GameObject card in displayedCard)
             {
                 card.transform.position = currentLyShowedDeck[CurrentDisplayCard].position;
-                card.GetComponent<PlayingCards>().orderInLayer -= 11;
+                card.GetComponent<PlayingCards>().orderInLayer -= 100;
                 card.transform.localScale = new Vector3(1,1,1);
                 if (CurrentDisplayCard!=1 && CurrentDisplayCard != 2&&CurrentDisplayCard != 3 && CurrentDisplayCard != 6 && CurrentDisplayCard != 5)
                 {
@@ -787,6 +811,8 @@ public class GameStateManager : MonoBehaviour
             backGroundWindow.SetActive(false);
             canInteract = true;
         }
+
+        skipTurnButton.SetActive(true);
         //move all card back
         //disable the cardif necessaaey
         //resetLayorder
@@ -806,10 +832,11 @@ public class GameStateManager : MonoBehaviour
             card.transform.localScale = new Vector3(0.8f, 0.8f, 1); 
             card.transform.position = new Vector3(FirstCardOfTheWindow.position.x + (count % 10) * 1.6f, -(int)(count / 10) * 2 + FirstCardOfTheWindow.position.y, 0);
             GameStateManager.displayedCard.Add(card);
-            card.GetComponent<PlayingCards>().orderInLayer += 11;
+            card.GetComponent<PlayingCards>().orderInLayer += 100;
             count++;
             card.SetActive(true);
         }
+        skipTurnButton.SetActive(false);
     }
 
     public void closePlayerPickWindow()
@@ -819,7 +846,7 @@ public class GameStateManager : MonoBehaviour
             foreach (GameObject card in displayedCard)
             {
                 card.transform.position = currentLyShowedDeck[CurrentDisplayCard].position;
-                card.GetComponent<PlayingCards>().orderInLayer -= 11;
+                card.GetComponent<PlayingCards>().orderInLayer -= 100;
                 card.transform.localScale = new Vector3(1, 1, 1);
                 if (CurrentDisplayCard != 1 && CurrentDisplayCard != 2 && CurrentDisplayCard != 3 && CurrentDisplayCard != 6 && CurrentDisplayCard != 5)
                 {
@@ -833,6 +860,8 @@ public class GameStateManager : MonoBehaviour
             backGroundWindow.SetActive(false);
             
         }
+
+        skipTurnButton.SetActive(true);
     }
 
     public void GameEndScreen()
@@ -848,10 +877,13 @@ public class GameStateManager : MonoBehaviour
             card.transform.localScale = new Vector3(0.8f, 0.8f, 1);
             card.transform.position = new Vector3(FirstCardOfTheWindow.position.x + (count % 10) * 1.6f, -(int)(count / 10) * 2 + FirstCardOfTheWindow.position.y, 0);
             GameStateManager.displayedCard.Add(card);
-            card.GetComponent<PlayingCards>().orderInLayer += 11;
+            card.GetComponent<PlayingCards>().orderInLayer += 100;
             count++;
             card.SetActive(true);
         }
+        SaveFile.currentScore += CalculateScore();
+        
+        GameEndButton.SetActive(true);
     }
 
     public int CalculateScore()//calculate the score based for the longest straight flush for each suit;
@@ -899,5 +931,18 @@ public class GameStateManager : MonoBehaviour
         }
 
         return result;
+    }
+
+    public void AddToList(GameObject card, List<GameObject> cardList)
+    {
+        if (cardList.Count!=0)
+        {
+            card.GetComponent<PlayingCards>().orderInLayer = cardList[cardList.Count - 1].GetComponent<PlayingCards>().orderInLayer + 1;
+        }
+        else
+        {
+            card.GetComponent<PlayingCards>().orderInLayer = 1;
+        }
+        cardList.Add(card);
     }
 }

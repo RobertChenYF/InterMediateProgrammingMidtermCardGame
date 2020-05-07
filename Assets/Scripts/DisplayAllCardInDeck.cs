@@ -13,6 +13,7 @@ public class DisplayAllCardInDeck : MonoBehaviour
     public int PileCode = -1;
     public Color Disabled;
     public Color Abled; 
+    
     // Start is called before the first frame update
     void Start()
     {
@@ -84,12 +85,13 @@ public class DisplayAllCardInDeck : MonoBehaviour
             PileName.text = GameObject.Find("GameStateManager").GetComponent<GameStateManager>().PileNames[GameStateManager.CurrentDisplayCard];
             card.transform.position = new Vector3(FirstCard.position.x+(count%10)*1.6f,- (int)(count/10)*2+FirstCard.position.y,0);
             GameStateManager.displayedCard.Add(card);
-            card.GetComponent<PlayingCards>().orderInLayer +=11;
+            card.GetComponent<PlayingCards>().orderInLayer +=100;
            count++;
             GameStateManager.canInteract = false;
             backGround.SetActive(true);
             card.SetActive(true);
         }
+        GameObject.Find("GameStateManager").GetComponent<GameStateManager>().skipTurnButton.SetActive(false);
     }
 
 
