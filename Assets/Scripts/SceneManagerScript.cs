@@ -5,23 +5,14 @@ using UnityEngine.SceneManagement;
 
 public class SceneManagerScript : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-      
-    }
+   
 
-    // Update is called once per frame
-    void Update()
+    public void LoadSceneWithNum(int sceneNumber) //load the scene
     {
-        
-    }
-
-    public void LoadSceneWithNum(int sceneNumber)
-    {
+        GameObject.Find("SaveSystem").GetComponent<SaveFile>().SaveThisFile();
         SceneManager.LoadScene(sceneNumber);
     }
-  public void QuitGame()
+  public void QuitGame()//quit the game
     {
         GameObject.Find("SaveSystem").GetComponent<SaveFile>().SaveThisFile();
         Application.Quit();

@@ -172,10 +172,10 @@ public class GameStateManager : MonoBehaviour
         unusedTopDeck = ShuffleCards(unusedTopDeck);
         unusedKings = ShuffleCards(unusedKings);
         //insert all the kings
-        unusedTopDeck.Insert(Random.Range(0, 9), unusedKings[0]);
-        unusedTopDeck.Insert(Random.Range(11, 20), unusedKings[1]);
-        unusedTopDeck.Insert(Random.Range(22, 31), unusedKings[2]);
-        unusedTopDeck.Insert(Random.Range(33, 42), unusedKings[3]);
+        unusedTopDeck.Insert(Random.Range(0, 10), unusedKings[0]);
+        unusedTopDeck.Insert(Random.Range(11, 21), unusedKings[1]);
+        unusedTopDeck.Insert(Random.Range(22, 32), unusedKings[2]);
+        unusedTopDeck.Insert(Random.Range(33, 43), unusedKings[3]);
         unusedKings.Clear();
         unusedBottomDeck = ShuffleCards(unusedBottomDeck);
     }
@@ -973,5 +973,21 @@ public class GameStateManager : MonoBehaviour
             card.GetComponent<PlayingCards>().orderInLayer = 1;
         }
         cardList.Add(card);
+    }
+
+    public void AssignAllBadges()// assign the three badges to the card
+    {
+        for (int i = 0; i < SaveFile.equipedBadges.Length; i ++)
+        {
+            int randomIndex = Random.Range(0, unusedTopDeck.Count);
+
+            while (unusedTopDeck[randomIndex].GetComponent<PlayingCards>().Ranking==13 &&unusedTopDeck[randomIndex].GetComponent<PlayingCards>().badgeCode!=-1)
+            {
+                randomIndex = Random.Range(0, unusedTopDeck.Count);
+            }
+
+            unusedTopDeck[randomIndex].GetComponent<PlayingCards>().badgeCode = SaveFile.equipedBadges[i];
+
+        }
     }
 }

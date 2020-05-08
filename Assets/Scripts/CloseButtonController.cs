@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-public class CloseButtonController : MonoBehaviour
+public class CloseButtonController : MonoBehaviour //close the currenly open window the display all cards
 {
 
     public Button CloseButton;

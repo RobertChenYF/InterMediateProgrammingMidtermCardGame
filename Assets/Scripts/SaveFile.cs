@@ -4,11 +4,11 @@ using UnityEngine;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 
-public class SaveFile : MonoBehaviour
+public class SaveFile : MonoBehaviour //very basic save file script, save the money earned, the badge purchased and the badge equiped
 {
-   public static int currentScore = 0;
+   public static int currentScore = 9999;
     public static int[] ifOwnBadge; //0: not revealed 1: revealed 2: owned 
-
+    public static int[] equipedBadges;
     private static SaveFile _instance;
 
     public static SaveFile Instance
@@ -25,9 +25,9 @@ public class SaveFile : MonoBehaviour
 
         _instance = this;
         DontDestroyOnLoad(this.gameObject);
-        ifOwnBadge = new int[3];
-
-        //SaveThisFile();
+        ifOwnBadge = new int[] { 1,1,1,0};
+        equipedBadges = new int[]{ -1,-1,-1};
+        SaveThisFile();
         LoadFile();
 
         
@@ -42,7 +42,7 @@ public class SaveFile : MonoBehaviour
         if (File.Exists(destination)) file = File.OpenWrite(destination);
         else file = File.Create(destination);
 
-        GameData data = new GameData(currentScore,ifOwnBadge);
+        GameData data = new GameData(currentScore,ifOwnBadge,equipedBadges);
         BinaryFormatter bf = new BinaryFormatter();
         bf.Serialize(file, data);
         file.Close();
@@ -66,9 +66,8 @@ public class SaveFile : MonoBehaviour
 
         currentScore = data.score;
         ifOwnBadge = data.BadgeArray;
+        equipedBadges = data.equip;
 
-       
-        Debug.Log(data.score);
        
     }
 
@@ -77,11 +76,12 @@ public class SaveFile : MonoBehaviour
     {
         public int score;
         public int[] BadgeArray;
-
-        public GameData(int scoreInt, int[]BArray)
+        public int[] equip;
+        public GameData(int scoreInt, int[]BArray, int[] equipedBadges)
         {
             score = scoreInt;
             BadgeArray = BArray;
+            equip = equipedBadges;
         }
     }
 }

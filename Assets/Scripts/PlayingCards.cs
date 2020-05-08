@@ -18,8 +18,10 @@ public class PlayingCards : MonoBehaviour
     public int cardCode;
     public Sprite cardImage;
     public int orderInLayer;
-    
-    
+
+    public int badgeCode = -1;
+    public Sprite[] badgeIcon;
+    public SpriteRenderer badge;
     
     
     public int CurrentCol = -2;
@@ -37,11 +39,16 @@ public class PlayingCards : MonoBehaviour
         }
     }
 
-    // Update is called once per frame
+    
     void Update()
     {
         GetComponent<SpriteRenderer>().sortingOrder = orderInLayer;
-
+        if (badgeCode!=-1)
+        {
+            badge.sprite = badgeIcon[badgeCode];
+            badge.sortingOrder = orderInLayer;
+        }
+        
         if (readyToBePickedByDummy)
         {
             unhighlishtedColor = blue;

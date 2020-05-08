@@ -22,6 +22,7 @@ public Setup(GameStateManager theGameStateManager) : base(theGameStateManager)
     {
         base.Enter();
         gameStateManager.MakingAllCards();
+        gameStateManager.AssignAllBadges();
 
     }
     public override void Leave()
@@ -31,7 +32,7 @@ public Setup(GameStateManager theGameStateManager) : base(theGameStateManager)
     }
 
 
-}
+}//make all cards in the beginning
 
 public class Refill : GameState
 {
@@ -72,7 +73,7 @@ public class Refill : GameState
         gameStateManager.RefreshDummyAI();
     }
 
-}
+}//refill the loot pile
 
 public class PlayerTurn : GameState
 {
@@ -110,7 +111,7 @@ public class PlayerTurn : GameState
         GameStateManager.SelectedCard = false;
         GameStateManager.canInteract = false;
     }
-}
+}//player's turn
 
 public class DummyTurn : GameState
 {
@@ -179,7 +180,7 @@ public class DummyTurn : GameState
     {
         base.Leave();
     }
-}
+}//dummy's turn
 
 public class PlayerPickFromDummyCard : GameState
 {
@@ -212,7 +213,7 @@ public class PlayerPickFromDummyCard : GameState
         base.Leave();
         gameStateManager.closePlayerPickWindow();
     }
-}
+}//special situation which player can pick a card from dummy
 public class EndGameState : GameState
 {
     public EndGameState(GameStateManager theGameStateManager) : base(theGameStateManager)
@@ -231,7 +232,7 @@ public class EndGameState : GameState
         base.Enter();
         gameStateManager.GameEndScreen();
     }
-}
+}//end game window
 
     
 

@@ -74,7 +74,7 @@ public class DisplayAllCardInDeck : MonoBehaviour
 
     }
 
-    private void PrintAllCard()
+    private void PrintAllCard()//print all cards currently in this pile to the window
     {
         int count = 0;
         GameStateManager.CurrentDisplayCard = PileCode;

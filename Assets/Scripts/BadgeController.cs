@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using TMPro;
 
-public class BadgeController : MonoBehaviour
+public class BadgeController : MonoBehaviour //control the display of badge inside the store
 {
     public Button thisBadge;
     
@@ -19,9 +19,10 @@ public class BadgeController : MonoBehaviour
     public TextMeshProUGUI price;
     public TextMeshProUGUI nameOfBadge;
 
+    public GameObject ownedText;
     public GameObject CoverImage;
-    // Start is called before the first frame update
-    void Start()
+    
+    void Start() //import the scriptable object
     {
         nameOfBadge.text = badge.BadgeName;
         icon.sprite = badge.BadgeImage;
@@ -29,13 +30,14 @@ public class BadgeController : MonoBehaviour
         price.text = "$" + badge.price;
     }
 
-    // Update is called once per frame
+    
     void Update()
     {
-        //Debug.Log(EventSystem.current);
+        //update the display based on whether it is revealed or purchased
         if (purchased)
         {
-            thisBadge.interactable = false;
+            thisBadge.interactable = true;
+            ownedText.SetActive(true);
             CoverImage.SetActive(false);
         }
         else if (!revealed)
