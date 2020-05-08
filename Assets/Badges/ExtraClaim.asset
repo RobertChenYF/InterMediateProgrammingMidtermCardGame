@@ -10,12 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a71d8b269da3ec84fbc84865e1a745b1, type: 3}
-  m_Name: Steal
+  m_Name: ExtraClaim
   m_EditorClassIdentifier: 
-  BadgeName: Steal
-  BadgeImage: {fileID: 21300000, guid: 3c8b07ae12a2e8d4c9d12a8125d5c4fe, type: 3}
-  badgeCode: 0
-  price: 150
-  description: 'Take one card from dummy
-
-'
+  BadgeName: Bonus
+  BadgeImage: {fileID: 21300000, guid: 5e7fff4e8bb3296419b0bc16ca8b2529, type: 3}
+  badgeCode: 1
+  price: 200
+  description: Claim again after you claim this card

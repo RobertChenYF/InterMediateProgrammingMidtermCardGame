@@ -7,19 +7,33 @@ using System.Runtime.Serialization.Formatters.Binary;
 public class SaveFile : MonoBehaviour
 {
    public static int currentScore = 0;
+    public static int[] ifOwnBadge; //0: not revealed 1: revealed 2: owned 
 
+    private static SaveFile _instance;
 
-
+    public static SaveFile Instance
+    {
+        get { return _instance; }
+    }
     private void Awake()
     {
-        DontDestroyOnLoad(gameObject);
+        if (_instance != null && _instance != this)
+        {
+            Destroy(this.gameObject);
+            return;
+        }
+
+        _instance = this;
+        DontDestroyOnLoad(this.gameObject);
+        ifOwnBadge = new int[3];
+
+        //SaveThisFile();
         LoadFile();
-        SaveThisFile();
+
         
     }
-    
-    
 
+    
     public void SaveThisFile()
     {
         string destination = Application.persistentDataPath + "/save.dat";
@@ -28,7 +42,7 @@ public class SaveFile : MonoBehaviour
         if (File.Exists(destination)) file = File.OpenWrite(destination);
         else file = File.Create(destination);
 
-        GameData data = new GameData(currentScore);
+        GameData data = new GameData(currentScore,ifOwnBadge);
         BinaryFormatter bf = new BinaryFormatter();
         bf.Serialize(file, data);
         file.Close();
@@ -51,7 +65,7 @@ public class SaveFile : MonoBehaviour
         file.Close();
 
         currentScore = data.score;
-        
+        ifOwnBadge = data.BadgeArray;
 
        
         Debug.Log(data.score);
@@ -62,12 +76,12 @@ public class SaveFile : MonoBehaviour
     public class GameData
     {
         public int score;
-        
+        public int[] BadgeArray;
 
-        public GameData(int scoreInt)
+        public GameData(int scoreInt, int[]BArray)
         {
             score = scoreInt;
-           
+            BadgeArray = BArray;
         }
     }
 }

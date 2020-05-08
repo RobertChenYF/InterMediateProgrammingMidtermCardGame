@@ -911,7 +911,7 @@ public class GameStateManager : MonoBehaviour
             card.SetActive(true);
         }
         SaveFile.currentScore += CalculateScore();
-        
+        GameObject.Find("SaveSystem").GetComponent<SaveFile>().SaveThisFile();
         GameEndButton.SetActive(true);
     }
 

@@ -23,7 +23,7 @@ public class SceneManagerScript : MonoBehaviour
     }
   public void QuitGame()
     {
-        GameObject.Find("SaveFile").GetComponent<SaveFile>().SaveThisFile();
+        GameObject.Find("SaveSystem").GetComponent<SaveFile>().SaveThisFile();
         Application.Quit();
     }
 }

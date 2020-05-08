@@ -36,8 +36,9 @@ public class BadgeController : MonoBehaviour
         if (purchased)
         {
             thisBadge.interactable = false;
+            CoverImage.SetActive(false);
         }
-        if (!revealed)
+        else if (!revealed)
         {
             thisBadge.interactable = false;
             CoverImage.SetActive(true);
