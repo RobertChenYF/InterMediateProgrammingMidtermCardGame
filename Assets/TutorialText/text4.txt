@@ -1,0 +1,3 @@
+This is the loot pile.
+You can claim all cards of the same suit from one of the columns from the loot.
+You cannot claim kings.

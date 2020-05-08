@@ -46,7 +46,7 @@ public class PlayingCards : MonoBehaviour
         if (badgeCode!=-1)
         {
             badge.sprite = badgeIcon[badgeCode];
-            badge.sortingOrder = orderInLayer;
+            badge.sortingOrder = orderInLayer +1;
         }
         
         if (readyToBePickedByDummy)

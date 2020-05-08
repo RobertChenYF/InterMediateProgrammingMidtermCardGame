@@ -1,0 +1,2 @@
+This is the dummy action deck.
+Dummy’s action is determined by the flipped cards in the dummy action deck.

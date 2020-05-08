@@ -1,6 +1,5 @@
-﻿Tdasdasdfsdfsdfsdf
-sadf
-sdf
-sadf
-dsfasdfsdfsdfffsdafasfsad
-sdafasdfsdfdsafsdafasdf
+﻿Dummy saves King is a solitaire card game. 
+The player will try to plunder the kingdom while the king is missing from the court. 
+The game is inspired by the board game Azul.
+Objects of the Game:
+To score as many points as you can before the dummy saves all 4 kings. Claimed cards and straight flush formed by your claimed cards can score you points as the end of the game. 

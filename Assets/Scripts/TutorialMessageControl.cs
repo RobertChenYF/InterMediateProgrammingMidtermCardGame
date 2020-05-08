@@ -27,8 +27,8 @@ public class TutorialMessageControl : MonoBehaviour
     private string currentText;
 
     public bool activate = false;
-   
-
+    public int messageCode;
+    public float delayBeforeNextMessage;
 
 
 
@@ -37,35 +37,35 @@ public class TutorialMessageControl : MonoBehaviour
 
     void Start()
     {
-        textBoxUI = textBoxContainer.GetComponent<RectTransform>();
-        Canvas = messageCanvas.GetComponent<RectTransform>();
-        messageCanvas.enabled = false;//turn off canvas at the beginning
-
-
-        textLines = (textFile1.text.Split('\n'));//splitting the text file in to lines
-        if (endLineAt == 0)
-        {
-            endLineAt = textLines.Length - 1; // set the number for the last line by how many lines the file has
-        }
+        
 
     }
 
+    
 
     void Update()
     {
         if (activate)
         {
-            TurnOnMessage();
+            textBoxUI = textBoxContainer.GetComponent<RectTransform>();
+            Canvas = messageCanvas.GetComponent<RectTransform>();
+            messageCanvas.enabled = true;
+
+
+            textLines = (textFile1.text.Split('\n'));//splitting the text file in to lines
+            if (endLineAt == 0)
+            {
+                endLineAt = textLines.Length - 1; // set the number for the last line by how many lines the file has
+            }
+            
         }
-        else
-        {
-            TurnOffMessage();
-        }
+        
+
         if (messageCanvas.enabled == true)
         {
             if (activate)
             {
-                
+                TutorialManager.TutorialOn = true;
                 Vector2 ViewportPosition = Camera.main.WorldToViewportPoint(transform.position);
                 Vector2 WorldObject_ScreenPosition = new Vector2(
                 ((ViewportPosition.x * Canvas.sizeDelta.x) - (Canvas.sizeDelta.x * 0.5f)),
@@ -73,47 +73,44 @@ public class TutorialMessageControl : MonoBehaviour
 
                 //now you can set the position of the ui element
                 textBoxUI.anchoredPosition = WorldObject_ScreenPosition;
-            }
-
-            //massage1.text = textLines[currentLine];
-
-
-            if ((Input.GetMouseButtonDown(0) && activate))
+                
+                
+                 if ((Input.GetMouseButtonDown(0)))
             {
-                if (currentLine > endLineAt)
+                if (currentLine > endLineAt-1)
                 {
                     
                     messageCanvas.enabled = false;
                     activate = false;
                     currentLine = 0;
-                    return;
+                    TutorialManager.TutorialOn = false;
+
+                    Invoke("LoadNextMessage",delayBeforeNextMessage);
+
+                       
                 }
 
                
-               // StopAllCoroutines();
-                fullText = textLines[currentLine];
-                massage1.text = fullText;
-                //StartCoroutine(TypeWriter());
+               
+                
+                
                 currentLine += 1;
             }
+               
+               fullText = textLines[currentLine];
+                massage1.text = fullText;
+            }
+
+            
+
+
+           
         }
 
 
     }
 
-    private void TurnOnMessage()
-    {
-        
-        messageCanvas.enabled = true;
-
-    }
-
-   
-
-    private void TurnOffMessage()
-    {
-        messageCanvas.enabled = false; //function for disable the canvas
-    }
+ 
 
     private IEnumerator TypeWriter()
     {
@@ -125,5 +122,8 @@ public class TutorialMessageControl : MonoBehaviour
         }
     }
 
-  
+  private void LoadNextMessage()
+    {
+        GameObject.Find("TutorialManager").GetComponent<TutorialManager>().LoadNextMessage(messageCode);
+    }
 }

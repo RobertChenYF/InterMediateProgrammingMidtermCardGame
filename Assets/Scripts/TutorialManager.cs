@@ -4,7 +4,10 @@ using UnityEngine;
 
 public class TutorialManager : MonoBehaviour
 {
-    public bool TutorialOn = true;
+    public static bool TutorialOn = true;
+    public List<GameObject> MessageList;
+
+
     void Awake()
     {
         Random.InitState(0);
@@ -21,10 +24,24 @@ public class TutorialManager : MonoBehaviour
         if (TutorialOn)
         {
             Time.timeScale = 0;
+            
         }
         else
         {
             Time.timeScale = 1;
+            
         }
+    }
+
+    public void LoadNextMessage(int currentMessage)
+    {
+
+        
+        if (currentMessage+1 < MessageList.Count)
+        {
+        MessageList[currentMessage + 1].GetComponent<TutorialMessageControl>().activate = true;
+        }
+        
+        
     }
 }

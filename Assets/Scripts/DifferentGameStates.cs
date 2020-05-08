@@ -230,7 +230,13 @@ public class EndGameState : GameState
     public override void Enter()
     {
         base.Enter();
-        gameStateManager.GameEndScreen();
+        gameStateManager.delayInvoke();
+        
+    }
+
+    public void EndState()
+    {
+        
     }
 }//end game window
 

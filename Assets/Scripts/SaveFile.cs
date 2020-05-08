@@ -27,7 +27,7 @@ public class SaveFile : MonoBehaviour //very basic save file script, save the mo
         DontDestroyOnLoad(this.gameObject);
         ifOwnBadge = new int[] { 1,1,1,0};
         equipedBadges = new int[]{ -1,-1,-1};
-        SaveThisFile();
+        //SaveThisFile();
         LoadFile();
 
         
@@ -40,7 +40,12 @@ public class SaveFile : MonoBehaviour //very basic save file script, save the mo
         FileStream file;
 
         if (File.Exists(destination)) file = File.OpenWrite(destination);
-        else file = File.Create(destination);
+        else { file = File.Create(destination);
+            ifOwnBadge = new int[] { 1, 1, 1, 0 };
+            equipedBadges = new int[] { -1, -1, -1 };
+            currentScore = 0;
+        }
+        
 
         GameData data = new GameData(currentScore,ifOwnBadge,equipedBadges);
         BinaryFormatter bf = new BinaryFormatter();
