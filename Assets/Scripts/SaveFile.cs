@@ -6,7 +6,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 
 public class SaveFile : MonoBehaviour //very basic save file script, save the money earned, the badge purchased and the badge equiped
 {
-   public static int currentScore = 9999;
+   public static int currentScore = 0;
     public static int[] ifOwnBadge; //0: not revealed 1: revealed 2: owned 
     public static int[] equipedBadges;
     private static SaveFile _instance;
