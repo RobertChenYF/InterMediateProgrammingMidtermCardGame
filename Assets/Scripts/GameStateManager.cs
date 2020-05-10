@@ -48,6 +48,7 @@ public class GameStateManager : MonoBehaviour
     public Transform LootPile;
     public Transform FirstCardOfTheWindow;
 
+    public static List<int> endTurnBadges;
     public string[] PileNames;
 
 
@@ -84,6 +85,8 @@ public class GameStateManager : MonoBehaviour
         unusedKings = new List<GameObject>();
         CardsinUnwantedStack = new List<GameObject>();
         CardsinLootArea = new List<GameObject>();
+        CardsinLootArea = new List<GameObject>();
+
         unwantedStack = new Stack<GameObject>[4];
         KingCardsInEachColumn = new int[4];
         for (int i = 0; i < 4; i++)
@@ -99,7 +102,7 @@ public class GameStateManager : MonoBehaviour
         displayedCard = new List<GameObject>();
         LootArea = new GameObject[4, 4];
         ChangeState(new Setup(this));
-
+        endTurnBadges = new List<int>();
         scoreForStraight = new int[] { 0, 0, 0, 3, 7, 12, 18, 25, 33, 42, 52 };
         skipTurn.onClick.AddListener(skipPlayerTurn);
     }
@@ -204,7 +207,7 @@ public class GameStateManager : MonoBehaviour
     //refill card to the loot;
     public bool DealCardToLoot()
     {
-        CardsClaimedByDummy.Sort(SortByCardCode);
+       // CardsClaimedByDummy.Sort(SortByCardCode);
         bool fullLoot = true;
         int minimumEmptySpaceCol = -99;
         int minimumEmptySpaceRow = -99;
@@ -261,8 +264,8 @@ public class GameStateManager : MonoBehaviour
         {
             foreach (GameObject card in usedBottomDeck)
             {
-                unusedBottomDeck.Add(card);
-
+                
+                AddToList(card,unusedBottomDeck);
             }
             unusedBottomDeck = ShuffleCards(unusedBottomDeck);
             usedBottomDeck.Clear();
@@ -738,7 +741,8 @@ public class GameStateManager : MonoBehaviour
                         unwantedStack[i].Peek().GetComponent<PlayingCards>().StartMoving(PlayerClaimedCardLocation.position);
                         unwantedStack[i].Peek().GetComponent<PlayingCards>().CurrentCol = -2;
                         CardsinUnwantedStack.Remove(unwantedStack[i].Peek());
-                        CardsClaimedByPlayer.Add(unwantedStack[i].Pop());
+                        AddToList(unwantedStack[i].Pop(),CardsClaimedByPlayer);
+                        
                         RefreshScore();
                         if (unwantedStack[i].Count != 0)
                         {
@@ -948,7 +952,7 @@ public class GameStateManager : MonoBehaviour
 
     public void RefreshScore()
     {
-        CardsClaimedByPlayer.Sort(SortByCardCode);
+        //CardsClaimedByPlayer.Sort(SortByCardCode);
         Score.text = "Score: " + CalculateScore();
     }
     static int SortByCardCode(GameObject card1, GameObject card2)
@@ -993,7 +997,7 @@ public class GameStateManager : MonoBehaviour
         if (cardList==CardsClaimedByPlayer && card.GetComponent<PlayingCards>().badgeCode!=-1)
         {
             Debug.Log("special effect");
-            SpecialEffect(card.GetComponent<PlayingCards>().badgeCode);
+            endTurnBadges.Add(card.GetComponent<PlayingCards>().badgeCode);
         }
     }
 
@@ -1015,7 +1019,7 @@ public class GameStateManager : MonoBehaviour
 
     public void SpecialEffect(int badgeCode)
     {
-        if (badgeCode == 0)
+        if (badgeCode == 0)//working
         {
             if (CardsClaimedByDummy.Count>0)
             {
@@ -1031,10 +1035,13 @@ public class GameStateManager : MonoBehaviour
            
             
         }
-        else if (badgeCode == 2)
+        else if (badgeCode == 2)//working
         {
-            if (CardsinLootArea.Count > 0)
+            if (CardsinLootArea.Count > 0&&unusedTopDeck.Count>0)
             {
+                GameObject switchCard = unusedTopDeck[Random.Range(0, unusedTopDeck.Count)];
+                switchCard.SetActive(true);
+                unusedTopDeck.Remove(switchCard);
                 foreach (GameObject card in CardsinLootArea)
                 {
                     if (card.GetComponent<PlayingCards>().Ranking == 13)
@@ -1046,19 +1053,28 @@ public class GameStateManager : MonoBehaviour
                         {
                             if (LootArea[card.GetComponent<PlayingCards>().CurrentCol,i] == card)
                             {
-                                LootArea[card.GetComponent<PlayingCards>().CurrentCol, i] = null;
+                                LootArea[card.GetComponent<PlayingCards>().CurrentCol, i] = switchCard;
+                                switchCard.GetComponent<PlayingCards>().CurrentCol = card.GetComponent<PlayingCards>().CurrentCol;
+                                card.GetComponent<PlayingCards>().CurrentCol = -2;
+                                switchCard.GetComponent<PlayingCards>().orderInLayer = card.GetComponent<PlayingCards>().orderInLayer;
+                                card.GetComponent<PlayingCards>().orderInLayer = -1;
+                                CardsinLootArea.Add(switchCard);
+                                Vector3 tempPosition = card.transform.position;
+                                switchCard.GetComponent<PlayingCards>().StartMoving(tempPosition);
+                                card.GetComponent<PlayingCards>().StartMoving(TopDeckTransform.position);
+                                break;
                             }
                         }
-                        card.GetComponent<PlayingCards>().CurrentCol = -2;
-                        card.GetComponent<PlayingCards>().orderInLayer = -1;
-                        card.GetComponent<PlayingCards>().StartMoving(TopDeckTransform.position);
+                        
+                        
+                        
                         break;
                     }
                 }
             }
 
         }
-        else if(badgeCode == 3)
+        else if(badgeCode == 3)//working
         {
             if (CardsinLootArea.Count > 0)
             {

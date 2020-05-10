@@ -91,7 +91,7 @@ public class PlayerTurn : GameState
             gameStateManager.RefreshDummyAI();
             if (GameStateManager.timer<0)
             {
-            gameStateManager.ChangeState(new DummyTurn(gameStateManager));
+            gameStateManager.ChangeState(new EndTurn(gameStateManager));
             }
             
         }
@@ -107,6 +107,8 @@ public class PlayerTurn : GameState
     {
         base.Leave();
         gameStateManager.RefreshDummyAI();
+        GameStateManager.highlightCol = -99;
+        GameStateManager.highlightSuit = -99;
         GameStateManager.SuitFromTheUnwantedPlayerChoose = -1;
         GameStateManager.SelectedCard = false;
         GameStateManager.canInteract = false;
@@ -214,7 +216,52 @@ public class PlayerPickFromDummyCard : GameState
         gameStateManager.closePlayerPickWindow();
     }
 }//special situation which player can pick a card from dummy
-public class EndGameState : GameState
+
+public class EndTurn : GameState // resolve badge effect
+{
+    public EndTurn(GameStateManager theGameStateManager) : base(theGameStateManager)
+    {
+
+    }
+
+
+    public override void stateBehavior()
+    {
+        if (GameStateManager.timer< 2* GameStateManager.endTurnBadges.Count)
+        {
+            if (GameStateManager.endTurnBadges.Count>0)
+            {
+                gameStateManager.SpecialEffect(GameStateManager.endTurnBadges[0]);
+                 GameStateManager.endTurnBadges.RemoveAt(0);
+            }
+            
+        }
+        if (GameStateManager.timer < 0)
+        {
+            gameStateManager.ChangeState(new DummyTurn(gameStateManager));
+        }
+        
+    }
+
+    public override void Enter()
+    {
+        base.Enter();
+        if (GameStateManager.endTurnBadges.Count >0)
+        {
+            GameStateManager.timer = 2 * GameStateManager.endTurnBadges.Count+2;
+        }
+        
+
+    }
+    public override void Leave()
+    {
+        base.Leave();
+        
+        gameStateManager.RefreshDummyAI();
+    }
+
+}
+public class EndGameState : GameState //show end game window
 {
     public EndGameState(GameStateManager theGameStateManager) : base(theGameStateManager)
     {
@@ -224,23 +271,20 @@ public class EndGameState : GameState
 
     public override void stateBehavior()
     {
-        
+
     }
 
     public override void Enter()
     {
         base.Enter();
         gameStateManager.delayInvoke();
-        
+
     }
 
-    public void EndState()
-    {
-        
-    }
-}//end game window
 
-    
+}
+
+
 
 
 

@@ -16,4 +16,4 @@ MonoBehaviour:
   BadgeImage: {fileID: 21300000, guid: 27849506444e32b4e981d574cae19132, type: 3}
   badgeCode: 2
   price: 250
-  description: Shuffle a card(include kings) from the loot pile back to the deck
+  description: Swap a king in the loot with a card in deck

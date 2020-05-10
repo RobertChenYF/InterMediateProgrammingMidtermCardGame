@@ -16,4 +16,5 @@ MonoBehaviour:
   BadgeImage: {fileID: 21300000, guid: 5e7fff4e8bb3296419b0bc16ca8b2529, type: 3}
   badgeCode: 1
   price: 200
-  description: Claim again after you claim this card
+  description: Claim again after you claim this card, it is not working, do not buy
+    this one

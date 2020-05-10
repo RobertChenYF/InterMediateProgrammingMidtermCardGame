@@ -77,7 +77,11 @@ public class PlayingCards : MonoBehaviour
         {
             highlightColor = yellow;
         }
-
+        if (CurrentCol<0||CurrentCol>4)
+        {
+            readyToBePickedByDummy = false;
+            currentColor = unhighlishtedColor;
+        }
 
         
         GetComponent<SpriteRenderer>().color = currentColor;
@@ -119,7 +123,7 @@ public class PlayingCards : MonoBehaviour
     }
     public void StartMoving(Vector3 TargetLocation)
     {
-        readyToBePickedByDummy = false;
+        //readyToBePickedByDummy = false;
         currentColor = white;
         StartCoroutine(MoveToLocation(transform.position,TargetLocation));
     }
@@ -142,7 +146,7 @@ public class PlayingCards : MonoBehaviour
         {
             unhighlishtedColor = white;
             currentColor = unhighlishtedColor;
-            readyToBePickedByDummy = false;
+            //readyToBePickedByDummy = false;
             gameStateManager.GetComponent<GameStateManager>().ClaimCard(Suit,CurrentCol,true);
             GameStateManager.SelectedCard = true;
             GameStateManager.timer = 2;
@@ -151,7 +155,7 @@ public class PlayingCards : MonoBehaviour
         {
             unhighlishtedColor = white;
             currentColor = unhighlishtedColor;
-            readyToBePickedByDummy = false;
+            //readyToBePickedByDummy = false;
             GameStateManager.SuitFromTheUnwantedPlayerChoose = Suit;
             if (gameStateManager.GetComponent<GameStateManager>().ClaimFromTheUnwanted(GameStateManager.SuitFromTheUnwantedPlayerChoose, true,gameObject) == false) {
 
