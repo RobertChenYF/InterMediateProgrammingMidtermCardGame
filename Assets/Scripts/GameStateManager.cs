@@ -245,7 +245,7 @@ public class GameStateManager : MonoBehaviour
             LootArea[minimumEmptySpaceCol, minimumEmptySpaceRow] = unusedTopDeck[0];
             CardsinLootArea.Add(unusedTopDeck[0]);
             unusedTopDeck[0].GetComponent<PlayingCards>().StartMoving(new Vector3(LootPile.position.x + gapBetweenCloumn * minimumEmptySpaceCol, LootPile.position.y - 1f * minimumEmptySpaceRow, 0 + minimumEmptySpaceRow * 0.1f));
-            unusedTopDeck[0].GetComponent<PlayingCards>().orderInLayer = minimumEmptySpaceRow;
+            unusedTopDeck[0].GetComponent<PlayingCards>().orderInLayer = minimumEmptySpaceRow*2;
             unusedTopDeck[0].GetComponent<PlayingCards>().CurrentCol = minimumEmptySpaceCol;
             unusedTopDeck.RemoveAt(0);
             return true;
@@ -266,6 +266,7 @@ public class GameStateManager : MonoBehaviour
             {
                 
                 AddToList(card,unusedBottomDeck);
+                card.GetComponent<PlayingCards>().StartMoving(BottomDeckTransform.position);
             }
             unusedBottomDeck = ShuffleCards(unusedBottomDeck);
             usedBottomDeck.Clear();
@@ -1030,7 +1031,7 @@ public class GameStateManager : MonoBehaviour
                 CardsClaimedByDummy.RemoveAt(randomIndex);
             }
         }
-        else if (badgeCode == 1)
+        else if (badgeCode == 1)//not working
         {
            
             
@@ -1102,9 +1103,59 @@ public class GameStateManager : MonoBehaviour
 
             }
         }
-        else
+        else if (badgeCode == 4)
         {
-            Debug.Log("WIP");
+            foreach (GameObject card in CardsinUnwantedStack)
+            {
+                card.GetComponent<PlayingCards>().CurrentCol = -2;
+                card.GetComponent<PlayingCards>().StartMoving(TopDeckTransform.position);
+                AddToList(card, unusedTopDeck);
+            }
+            CardsinUnwantedStack.Clear();
+            unwantedStack[0].Clear();
+            unwantedStack[1].Clear();
+            unwantedStack[2].Clear(); 
+            unwantedStack[3].Clear();
         }
+        else if (badgeCode == 5)//working
+        {
+            List<GameObject> tempChange = new List<GameObject>();
+
+            foreach (GameObject card in CardsClaimedByPlayer)
+            {
+                AddToList(card, tempChange);
+            }
+            CardsClaimedByPlayer.Clear();
+
+            foreach (GameObject card in CardsClaimedByDummy)
+            {
+                card.GetComponent<PlayingCards>().StartMoving(PlayerClaimedCardLocation.position);
+                AddToList(card, CardsClaimedByPlayer);
+            }
+            RefreshScore();
+            CardsClaimedByDummy.Clear();
+            foreach (GameObject card in tempChange)
+            {
+                card.GetComponent<PlayingCards>().StartMoving(DummyClaimedCardLocation.position);
+                AddToList(card, CardsClaimedByDummy);
+            }
+
+        }
+        else if (badgeCode == 6)//working
+        {
+            if (CardsClaimedByPlayer.Count>0)
+            {
+                foreach (GameObject card in CardsClaimedByPlayer)
+                {
+                    card.GetComponent<PlayingCards>().StartMoving(TopDeckTransform.position);
+                    AddToList(card,unusedTopDeck);
+                }
+
+                CardsClaimedByPlayer.Clear();
+                ShuffleCards(unusedTopDeck);
+                RefreshScore();
+            }
+        }
+        
     }
 }

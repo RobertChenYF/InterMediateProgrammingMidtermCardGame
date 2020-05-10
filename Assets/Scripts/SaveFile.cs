@@ -25,7 +25,7 @@ public class SaveFile : MonoBehaviour //very basic save file script, save the mo
 
         _instance = this;
         DontDestroyOnLoad(this.gameObject);
-        ifOwnBadge = new int[] { 1,1,1,0};
+        ifOwnBadge = new int[] { 1,1,1,0,0,0,0};
         equipedBadges = new int[]{ -1,-1,-1};
         //SaveThisFile();
         LoadFile();

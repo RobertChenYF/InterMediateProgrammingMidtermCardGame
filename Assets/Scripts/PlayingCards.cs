@@ -173,6 +173,7 @@ public class PlayingCards : MonoBehaviour
             GameStateManager.specialSituation = false;
             StartMoving(GameObject.Find("GameStateManager").GetComponent<GameStateManager>().PlayerClaimedCardLocation.position);
             GameObject.Find("GameStateManager").GetComponent<GameStateManager>().AddToList(gameObject, GameObject.Find("GameStateManager").GetComponent<GameStateManager>().CardsClaimedByPlayer);
+            orderInLayer += 200;
             gameStateManager.GetComponent<GameStateManager>().RefreshScore();
             GameObject.Find("GameStateManager").GetComponent<GameStateManager>().CardsClaimedByDummy.Remove(gameObject);
         }
